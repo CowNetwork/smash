@@ -4,7 +4,10 @@ import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
 import network.cow.minigame.noma.api.phase.EmptyPhaseResult
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
+import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.item.ItemManger
+import network.cow.minigame.smash.item.ItemRemoveEvent
+import network.cow.minigame.smash.item.ItemSpawner
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -25,7 +28,19 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerLeave(player: Player) = Unit
 
     override fun onStart() {
-        // TODO: create item manager
+        val conf: Config = Config.fromMap(this.game.config.options)
+
+        ItemSpawner(
+            conf.itemsPerInterval,
+            conf.items,
+            conf.itemSpawnLocations, // locations
+            conf.items.map { it.type }.toList(), // generate items to use from configured items
+            itemManager
+        ).runTaskTimer(
+            JavaPlugin.getPlugin(SmashPlugin::class.java),
+            conf.itemSpawnerDelay.toLong(),
+            conf.itemSpawnerInterval.toLong()
+        )
     }
 
     override fun onStop(): EmptyPhaseResult {
@@ -33,6 +48,11 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     }
 
     override fun onTimeout() = Unit
+
+    @EventHandler
+    private fun onItemRemove(event: ItemRemoveEvent) {
+        this.itemManager.removeItem(event.item.id)
+    }
 
     @EventHandler
     private fun onPickUp(event: EntityPickupItemEvent) {

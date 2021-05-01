@@ -1,7 +1,6 @@
 package network.cow.minigame.smash.item
 
-import network.cow.minigame.smash.config.Config
-import network.cow.minigame.smash.config.ItemConfigEntry
+import network.cow.minigame.smash.config.ItemConfig
 import org.bukkit.Location
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -9,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable
 
 class ItemSpawner(
     private val itemNum: Int,
-    private val itemConfigs: List<ItemConfigEntry>,
+    private val itemConfigs: List<ItemConfig>,
     private val locations: List<Location>,
     private val types: List<ItemType>,
     private val itemManger: ItemManger

@@ -8,4 +8,4 @@ import network.cow.minigame.smash.item.ItemType
       knockbackStrengthPercentage: 5
  */
 
-data class ItemConfigEntry(val type: ItemType, val data: Map<String, Any>)
+data class ItemConfig(val type: ItemType, val data: Map<String, Any>)
