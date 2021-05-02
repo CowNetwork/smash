@@ -10,14 +10,21 @@ import org.bukkit.util.Vector
 fun Player.knockback(direction: Vector, power: Double) {
     val reduction = this.getKnockbackStrength() * this.getKnockbackReduction()
     val actualKnockback = this.getKnockbackStrength() - reduction + power
+    this.setKnockbackStrength(this.getKnockbackStrength() + power)
     BummsTask(
         this,
+        // use actualKnockback instead of this.getKnockbackStrength() here,
+        // because we also want to account the temporary reduction if there is any
         direction.normalize().multiply(actualKnockback)
     ).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)
 }
 
 fun Player.getKnockbackReduction(): Double {
     return this.getSmashState(StateKey.KNOCKBACK_REDUCTION, 0.0)
+}
+
+fun Player.setKnockbackStrength(strength: Double) {
+    return this.setSmashState(StateKey.KNOCKBACK, strength)
 }
 
 fun Player.getKnockbackStrength(): Double {
