@@ -11,7 +11,7 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class UnstuckCommand(private val spawnLocations: List<SpawnLocation>) : CommandExecutor {
+class UnstuckCommand(private val spawnLocations: List<Location>) : CommandExecutor {
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) return false
         if (!sender.canUseUnstuckCommand()) {
@@ -19,7 +19,7 @@ class UnstuckCommand(private val spawnLocations: List<SpawnLocation>) : CommandE
             return false
         }
         sender.setCanUseUnstuckCommand(false)
-        sender.teleport(spawnLocations.random().toLocation(sender.world))
+        sender.teleport(spawnLocations.random())
         return true
     }
 }

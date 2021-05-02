@@ -8,13 +8,16 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.util.Vector
 
-class MapConfig(val itemSpawnLocations: List<Location>) {
+class MapConfig(val itemSpawnLocations: List<Location>, val playerSpawnLocations: List<Location>) {
     companion object {
         fun from(world: World, worldMeta: WorldMeta): MapConfig {
             val itemSpawnLocations = (worldMeta.options["itemSpawnLocations"] as List<Map<String, Any>>).map {
                 readLocation(world, it)
             }.toList()
-            return MapConfig(itemSpawnLocations)
+            return MapConfig(
+                itemSpawnLocations,
+                worldMeta.globalSpawnLocations.map { it.toLocation(world) }.toList()
+            )
         }
 
         private fun readLocation(world: World, map: Map<String, Any>): Location {

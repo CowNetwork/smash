@@ -1,6 +1,7 @@
 package network.cow.minigame.smash
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
 import network.cow.minigame.noma.api.phase.EmptyPhaseResult
@@ -11,52 +12,70 @@ import network.cow.minigame.noma.spigot.pool.WorldMeta
 import network.cow.minigame.smash.command.UnstuckCommand
 import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.config.MapConfig
+import network.cow.minigame.smash.event.PlayerLostLifeEvent
 import network.cow.minigame.smash.item.ItemManger
-import network.cow.minigame.smash.item.ItemRemoveEvent
+import network.cow.minigame.smash.event.ItemRemoveEvent
 import network.cow.minigame.smash.item.ItemSpawner
 import org.bukkit.*
+import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
-import org.bukkit.configuration.MemorySection
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
-import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scheduler.BukkitRunnable
 import kotlin.math.pow
 
 
 class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<EmptyPhaseResult>(game, config) {
 
     private lateinit var itemManager: ItemManger
-    private lateinit var conf: Config
+    private lateinit var gameConfig: Config
+    private lateinit var mapConfig: MapConfig
 
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
 
+    // TODO: more items
+    // TODO: display lives left and eliminate player
+    // TODO: determine percentage based on knockbackStrength and display
+
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
-        val mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
-        conf = Config.fromMap(this.game.config.options)
-        itemManager = ItemManger(conf)
+        mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
+        gameConfig = Config.fromMap(this.game.config.options)
+        itemManager = ItemManger(gameConfig)
 
         JavaPlugin.getPlugin(SmashPlugin::class.java).
             getCommand("unstuck")?.
-            setExecutor(UnstuckCommand(worldMeta.globalSpawnLocations))
+            setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
 
         ItemSpawner(
-            conf.itemsPerInterval,
-            conf.items,
+            gameConfig.itemsPerInterval,
+            gameConfig.items,
             mapConfig.itemSpawnLocations,
-            conf.items.map { it.type }.toList(), // generate items to use from configured items
+            gameConfig.items.map { it.type }.toList(), // generate items to use from configured items
             itemManager
         ).runTaskTimer(
             JavaPlugin.getPlugin(SmashPlugin::class.java),
-            conf.itemSpawnerDelay.toLong(),
-            conf.itemSpawnerInterval.toLong()
+            gameConfig.itemSpawnerDelay.toLong(),
+            gameConfig.itemSpawnerInterval.toLong()
         )
+
+        this.game.getPlayers().forEach {
+            val attr = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)
+            if (gameConfig.livesPerPlayer < 0) { // elimination is not enabled -> unlimited lives
+                // display hearts in a special way to allow the player to distinguish if
+                // elimination is enabled and if it is not
+                attr?.baseValue = 6.0
+                it.absorptionAmount = 6.0
+                return
+            }
+            it.setLivesLeft(gameConfig.livesPerPlayer)
+            attr?.baseValue = gameConfig.livesPerPlayer.toDouble() * 2
+        }
 
         Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
             this.game.getPlayers().forEach {
@@ -78,11 +97,31 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     }
 
     @EventHandler
+    private fun onPlayerLostLife(event: PlayerLostLifeEvent) {
+        val livesLeft = event.player.getLivesLeft()
+        if (livesLeft < 0) return // we have infinite lives left
+        if (livesLeft == 0) {
+            event.player.gameMode = GameMode.SPECTATOR
+            event.player.sendMessage(Component.text("DU BIST RAUS!!!").color(NamedTextColor.BLUE))
+            // TODO: play sound
+        }
+        event.player.teleport(mapConfig.playerSpawnLocations.random())
+    }
+
+    @EventHandler
     private fun onPickUp(event: EntityPickupItemEvent) {
         if (event.entity !is Player) return
         val id = event.item.itemStack.getSmashId() ?: return
         val item = this.itemManager.getItemById(id) ?: return
         item.register()
+    }
+
+    @EventHandler
+    private fun onPlayerOutOfWorld(event: EntityDamageEvent) {
+        if (event.entity !is Player) return
+        val player = event.entity as Player
+        if (event.cause != EntityDamageEvent.DamageCause.VOID) return
+        player.looseLife()
     }
 
     @EventHandler
@@ -92,7 +131,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         val damager = event.damager as Player
         val damaged = event.entity as Player
         if (damager.inventory.itemInMainHand.type != Material.AIR) return
-        damaged.knockback(damager.location.direction, conf.baseKnockback)
+        damaged.knockback(damager.location.direction, gameConfig.baseKnockback)
     }
 
     @EventHandler

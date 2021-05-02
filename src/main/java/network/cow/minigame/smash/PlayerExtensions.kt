@@ -1,8 +1,10 @@
 package network.cow.minigame.smash
 
+import network.cow.minigame.smash.event.PlayerLostLifeEvent
 import network.cow.spigot.extensions.state.getState
 import network.cow.spigot.extensions.state.setState
-import org.bukkit.Material
+import org.bukkit.Bukkit
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.Vector
@@ -17,6 +19,22 @@ fun Player.knockback(direction: Vector, power: Double) {
         // because we also want to account the temporary reduction if there is any
         direction.normalize().multiply(actualKnockback)
     ).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)
+}
+
+fun Player.looseLife() {
+    val livesLeft = this.getSmashState(StateKey.LIVES, 1).dec()
+    this.setSmashState(StateKey.LIVES, livesLeft)
+    this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue = livesLeft.toDouble() * 2
+    Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
+    // TODO: play sound
+}
+
+fun Player.getLivesLeft(): Int {
+    return this.getSmashState(StateKey.LIVES, 1)
+}
+
+fun Player.setLivesLeft(lives: Int) {
+    this.setSmashState(StateKey.LIVES, lives)
 }
 
 fun Player.setCanUseUnstuckCommand(can: Boolean) {

@@ -7,7 +7,8 @@ class Config(
     val baseKnockback: Double, // base knockback
     val itemSpawnerDelay: Int,
     val itemSpawnerInterval: Int,
-    val itemsPerInterval: Int, // how many items should be dropped per interval
+    val itemsPerInterval: Int, // how many items should be dropped per interval,
+    val livesPerPlayer: Int,
     val items: List<ItemConfig> // config for all items
 ) {
     companion object {
@@ -22,6 +23,7 @@ class Config(
                 spawnerSection["delay"] as Int,
                 spawnerSection["interval"] as Int,
                 spawnerSection["itemsPerInterval"] as Int,
+                map["livesPerPlayer"] as Int,
                 items
             )
         }

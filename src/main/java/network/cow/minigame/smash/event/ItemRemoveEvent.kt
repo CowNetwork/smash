@@ -1,5 +1,6 @@
-package network.cow.minigame.smash.item
+package network.cow.minigame.smash.event
 
+import network.cow.minigame.smash.item.Item
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 

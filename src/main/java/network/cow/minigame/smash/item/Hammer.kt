@@ -3,6 +3,7 @@ package network.cow.minigame.smash.item
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.*
+import network.cow.minigame.smash.event.ItemRemoveEvent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
