@@ -1,5 +1,7 @@
 package network.cow.minigame.smash.item
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -30,6 +32,11 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
             return handle
         }
         handle = ItemStack(Material.NETHERITE_AXE)
+        val meta = handle.itemMeta
+        meta.isUnbreakable = true
+        meta.displayName(Component.text("hammer"))
+        meta.lore(listOf(Component.text(this.id.toString()).color(NamedTextColor.BLACK)))
+        handle.itemMeta = meta
         handle.setSmashState(StateKey.ITEM_ID, this.id)
         return handle
     }
@@ -45,9 +52,8 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
     private fun onDamage(event: EntityDamageByEntityEvent) {
         if (event.damager !is Player || event.entity !is Player) return
         val damager = event.damager as Player
-
         val itemId: UUID? = damager.inventory.itemInMainHand.getSmashState(StateKey.ITEM_ID)
-        if (id != itemId) return
+        if (this.id != itemId) return
 
         this.use(damager, listOf(event.entity as Player))
     }

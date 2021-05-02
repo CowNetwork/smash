@@ -1,5 +1,6 @@
 package network.cow.minigame.smash
 
+import net.kyori.adventure.text.Component
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
 import network.cow.minigame.noma.api.phase.EmptyPhaseResult
@@ -49,6 +50,13 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             conf.itemSpawnerDelay.toLong(),
             conf.itemSpawnerInterval.toLong()
         )
+
+        Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
+            this.game.getPlayers().forEach {
+                it.sendActionBar(Component.text(it.getKnockbackStrength()))
+            }
+        }, 0, 20)
+
     }
 
     override fun onStop(): EmptyPhaseResult {
@@ -72,7 +80,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
     @EventHandler
     private fun onEntityDamageByEntity(e: EntityDamageByEntityEvent) {
-        if (e.entity !is Player) {
+       /* if (e.entity !is Player) {
             return
         }
 
@@ -80,7 +88,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         val vel = e.damager.location.clone().direction.normalize().multiply(0)
 
         // bumms the player away
-        BummsTask(player, vel).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)
+        BummsTask(player, vel).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)*/
     }
 
     @EventHandler

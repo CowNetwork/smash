@@ -14,4 +14,4 @@ game:
   spawner:
     itemsPerInterval: 1
     delay: 20 # ticks
-    interval: 40 # ticks
+    interval: 20 # ticks
