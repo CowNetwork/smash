@@ -74,7 +74,7 @@ fun Player.setKnockbackStrength(strength: Double) {
 }
 
 fun Player.getKnockbackStrength(): Double {
-    return this.getSmashState(StateKey.KNOCKBACK, 0.1)
+    return this.getSmashState(StateKey.KNOCKBACK, 0.0)
 }
 
 fun Player.setSmashState(key: StateKey, value: Any) {

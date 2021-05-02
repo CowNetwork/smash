@@ -46,9 +46,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     // TODO: determine percentage based on knockbackStrength and display
     // TODO: ROCKET LAUNCHER
     // TODO: JET_PACK
-    // knockbackStrength reset on death
-    // p
-    // leute aufheben und wegwerden (cooldown)
+    // TODO: track stats (kills etc.)
+    // TODO: use itemBuilder
+    // TODO: leute aufheben und wegwerden (cooldown)
+    // TODO: 0.1 is one % -> 10 is 1000%
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
