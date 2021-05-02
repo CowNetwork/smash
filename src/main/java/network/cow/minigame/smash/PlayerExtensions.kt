@@ -29,6 +29,15 @@ fun Player.looseLife() {
     // TODO: play sound
 }
 
+fun Player.canDoubleJump(): Boolean {
+    return this.getSmashState(StateKey.LAST_DOUBLE_JUMP_USAGE, false)
+}
+
+fun Player.setCanDoubleJump(can: Boolean) {
+    this.setSmashState(StateKey.LAST_DOUBLE_JUMP_USAGE, can)
+}
+
+
 fun Player.getLivesLeft(): Int {
     return this.getSmashState(StateKey.LIVES, 1)
 }

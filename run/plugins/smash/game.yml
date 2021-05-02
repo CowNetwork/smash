@@ -6,6 +6,7 @@ game:
   # smash specific config
   baseKnockback: 0.1
   livesPerPlayer: 2 # -1 is infinite lives - no elimination from the match
+  doubleJumpCooldown: 8 # seconds
   items:
     - type: HAMMER
       data:

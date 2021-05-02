@@ -9,6 +9,7 @@ class Config(
     val itemSpawnerInterval: Int,
     val itemsPerInterval: Int, // how many items should be dropped per interval,
     val livesPerPlayer: Int,
+    val doubleJumpCooldown: Int,
     val items: List<ItemConfig> // config for all items
 ) {
     companion object {
@@ -24,6 +25,7 @@ class Config(
                 spawnerSection["interval"] as Int,
                 spawnerSection["itemsPerInterval"] as Int,
                 map["livesPerPlayer"] as Int,
+                map["doubleJumpCooldown"] as Int,
                 items
             )
         }

@@ -18,5 +18,7 @@ enum class StateKey(val key: String) {
 
     ITEM_ID("itemId"),
 
-    CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand")
+    CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand"),
+
+    LAST_DOUBLE_JUMP_USAGE("lastDoubleJumpUsage")
 }

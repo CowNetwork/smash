@@ -25,7 +25,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 
@@ -39,8 +41,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerLeave(player: Player) = Unit
 
     // TODO: more items
-    // TODO: display lives left and eliminate player
     // TODO: determine percentage based on knockbackStrength and display
+    // TODO: ROCKET LAUNCHER
+    // TODO: JET_PACK
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
@@ -64,6 +67,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             gameConfig.itemSpawnerInterval.toLong()
         )
 
+        // set basic values
         this.game.getPlayers().forEach {
             val attr = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)
             if (gameConfig.livesPerPlayer < 0) { // elimination is not enabled -> unlimited lives
@@ -73,8 +77,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
                 it.absorptionAmount = 6.0
                 return
             }
-            it.setLivesLeft(gameConfig.livesPerPlayer)
             attr?.baseValue = gameConfig.livesPerPlayer.toDouble() * 2
+            it.allowFlight = true
+            it.setLivesLeft(gameConfig.livesPerPlayer)
+            it.setCanDoubleJump(true)
         }
 
         Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
@@ -94,6 +100,28 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onItemRemove(event: ItemRemoveEvent) {
         this.itemManager.removeItem(event.item.id)
+    }
+
+    @EventHandler
+    private fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
+        val player = event.player
+
+        if (!player.canDoubleJump()) {
+            player.sendMessage(Component.text("NEIN").color(NamedTextColor.RED))
+            event.isCancelled = true
+            return
+        }
+
+        player.velocity = player.location.direction.setY(1.0).normalize().multiply(1.5)
+        player.allowFlight = false
+        player.setCanDoubleJump(false)
+        event.isCancelled = true
+
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
+            player.setCanDoubleJump(true)
+            player.allowFlight = true
+            // TODO: sound
+        }, 20 * gameConfig.doubleJumpCooldown.toLong())
     }
 
     @EventHandler

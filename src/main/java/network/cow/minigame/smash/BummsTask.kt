@@ -17,12 +17,10 @@ class BummsTask(private val player: Player, speed: Vector) : BukkitRunnable() {
     private var velZ = speed.z
 
     override fun run() {
-        player.allowFlight = true
         if (velY > VANILA_ANTICHEAT_THRESHOLD) {
             player.velocity = Vector(velX, VANILA_ANTICHEAT_THRESHOLD, velZ);
         } else {
             player.velocity = Vector(velX, velY, velZ)
-            player.allowFlight = false
             this.cancel();
         }
         velY -= GRAVITY_CONSTANT;
