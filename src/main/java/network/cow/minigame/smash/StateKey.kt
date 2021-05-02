@@ -20,5 +20,7 @@ enum class StateKey(val key: String) {
 
     CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand"),
 
-    LAST_DOUBLE_JUMP_USAGE("lastDoubleJumpUsage")
+    CAN_USE_DOUBLE_JUMP("canUseDoubleJump"),
+
+    HITTER("hitter")
 }

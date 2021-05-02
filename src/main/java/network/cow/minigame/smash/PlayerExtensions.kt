@@ -1,11 +1,13 @@
 package network.cow.minigame.smash
 
 import network.cow.minigame.smash.event.PlayerLostLifeEvent
+import network.cow.spigot.extensions.state.clearState
 import network.cow.spigot.extensions.state.getState
 import network.cow.spigot.extensions.state.setState
 import org.bukkit.Bukkit
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.Vector
 
@@ -23,20 +25,37 @@ fun Player.knockback(direction: Vector, power: Double) {
 
 fun Player.looseLife() {
     val livesLeft = this.getSmashState(StateKey.LIVES, 1).dec()
+    this.setKnockbackStrength(0.0)
+
+    if (livesLeft < 0) { // unlimited lives
+        Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
+        return
+    }
+
     this.setSmashState(StateKey.LIVES, livesLeft)
     this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue = livesLeft.toDouble() * 2
     Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
-    // TODO: play sound
+}
+
+fun Player.getHitter(): Hitter? {
+    return this.getSmashState(StateKey.HITTER)
+}
+
+fun Player.setHitter(hitter: Hitter?) {
+    if (hitter == null) {
+        this.clearState(SmashPlugin::class.java, StateKey.HITTER.key)
+        return
+    }
+    this.setSmashState(StateKey.HITTER, hitter)
 }
 
 fun Player.canDoubleJump(): Boolean {
-    return this.getSmashState(StateKey.LAST_DOUBLE_JUMP_USAGE, false)
+    return this.getSmashState(StateKey.CAN_USE_DOUBLE_JUMP, false)
 }
 
 fun Player.setCanDoubleJump(can: Boolean) {
-    this.setSmashState(StateKey.LAST_DOUBLE_JUMP_USAGE, can)
+    this.setSmashState(StateKey.CAN_USE_DOUBLE_JUMP, can)
 }
-
 
 fun Player.getLivesLeft(): Int {
     return this.getSmashState(StateKey.LIVES, 1)

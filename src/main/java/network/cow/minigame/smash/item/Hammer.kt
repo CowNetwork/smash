@@ -23,6 +23,7 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
 
     override fun use(user: Player, affected: List<Player>) {
         val power = baseKnockback * baseKnockbackMultiplier
+        affected.first().setHitter(Hitter(user, ItemType.HAMMER))
         affected.first().knockback(user.location.clone().direction, power)
         this.remove(user)
     }

@@ -16,9 +16,11 @@ import network.cow.minigame.smash.event.PlayerLostLifeEvent
 import network.cow.minigame.smash.item.ItemManger
 import network.cow.minigame.smash.event.ItemRemoveEvent
 import network.cow.minigame.smash.item.ItemSpawner
+import network.cow.minigame.smash.item.ItemType
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -44,6 +46,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     // TODO: determine percentage based on knockbackStrength and display
     // TODO: ROCKET LAUNCHER
     // TODO: JET_PACK
+    // double jump stärker
+    // knockbackStrength reset on death
+    // leute aufheben und wegwerden (cooldown)
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
@@ -75,9 +80,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
                 // elimination is enabled and if it is not
                 attr?.baseValue = 6.0
                 it.absorptionAmount = 6.0
-                return
+            } else {
+                attr?.baseValue = gameConfig.livesPerPlayer.toDouble() * 2
             }
-            attr?.baseValue = gameConfig.livesPerPlayer.toDouble() * 2
+
             it.allowFlight = true
             it.setLivesLeft(gameConfig.livesPerPlayer)
             it.setCanDoubleJump(true)
@@ -88,7 +94,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
                 it.sendActionBar(Component.text(it.getKnockbackStrength()))
             }
         }, 0, 20)
-
     }
 
     override fun onStop(): EmptyPhaseResult {
@@ -106,28 +111,33 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     private fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
         val player = event.player
 
+        /*
         if (!player.canDoubleJump()) {
             player.sendMessage(Component.text("NEIN").color(NamedTextColor.RED))
             event.isCancelled = true
             return
-        }
+        }*/
 
-        player.velocity = player.location.direction.setY(1.0).normalize().multiply(1.5)
+        player.velocity = player.location.direction.setY(0.5).normalize().multiply(2)
         player.allowFlight = false
-        player.setCanDoubleJump(false)
+        //player.setCanDoubleJump(false)
         event.isCancelled = true
 
+        /*
         Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
             player.setCanDoubleJump(true)
             player.allowFlight = true
-            // TODO: sound
-        }, 20 * gameConfig.doubleJumpCooldown.toLong())
+            player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 0.5f)
+        }, 20 * gameConfig.doubleJumpCooldown.toLong())*/
     }
 
     @EventHandler
     private fun onPlayerLostLife(event: PlayerLostLifeEvent) {
         val livesLeft = event.player.getLivesLeft()
-        if (livesLeft < 0) return // we have infinite lives left
+        if (livesLeft < 0) { // we have infinite lives left
+            event.player.teleport(mapConfig.playerSpawnLocations.random())
+            return
+        }
         if (livesLeft == 0) {
             event.player.gameMode = GameMode.SPECTATOR
             event.player.sendMessage(Component.text("DU BIST RAUS!!!").color(NamedTextColor.BLUE))
@@ -159,17 +169,28 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         val damager = event.damager as Player
         val damaged = event.entity as Player
         if (damager.inventory.itemInMainHand.type != Material.AIR) return
+        damaged.setHitter(Hitter(damager, ItemType.NONE))
         damaged.knockback(damager.location.direction, gameConfig.baseKnockback)
     }
 
     @EventHandler
     private fun onPlayerMove(e: PlayerMoveEvent) {
         val player = e.player
+
+        // reset double jump if player is on ground again
+        if (player.location.block.getRelative(BlockFace.DOWN).type != Material.AIR) {
+             player.allowFlight = true
+        }
+
         val vel = e.to.clone().toVector().subtract(e.from.clone().toVector())
         if (vel.lengthSquared() < 1) {
             val prev = player.getSmashState(StateKey.VELOCITY, "LOW")
-            if (prev == "HIGH") {
+            // Hitter is currently only used to track whether surroundings
+            // should be destroyed or not since normal falling speed could
+            // also trigger prev == "HIGH".
+            if (prev == "HIGH" && player.getHitter() != null) {
                 destroyAndReplaceBlockByBlock(player)
+                player.setHitter(null) // reset hitter since we already have been smashed against the wall
             }
             player.setSmashState(StateKey.VELOCITY, "LOW")
         } else if (vel.lengthSquared() >= 1) {
