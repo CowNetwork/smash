@@ -11,7 +11,7 @@ class ItemManger(private val config: Config) {
     fun createItem(type: ItemType, itemConfig: ItemConfig): Item {
        return when (type) {
             ItemType.HAMMER -> {
-                val item = Hammer(itemConfig.data["knockbackStrengthPercentage"] as Double, config.baseKnockback)
+                val item = Hammer(itemConfig.data["baseKnockbackMultiplier"] as Double, config.baseKnockback)
                 this.items[item.id] = item
                 item
             }

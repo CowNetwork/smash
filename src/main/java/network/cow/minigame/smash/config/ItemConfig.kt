@@ -1,6 +1,7 @@
 package network.cow.minigame.smash.config
 
 import network.cow.minigame.smash.item.ItemType
+import org.bukkit.configuration.MemorySection
 
 /*
   - type: HAMMER

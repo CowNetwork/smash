@@ -15,11 +15,13 @@ class ItemSpawner(
 ) : BukkitRunnable() {
 
     override fun run() {
+        println("SPAWN $itemNum")
         for (i in 0 until itemNum) {
             val loc = locations.random()
             val type = types.random()
             this.itemConfigs.find { it.type == type }?.let {
                 val item = itemManger.createItem(type, it)
+                println("SPAWNED ${item.id} at $loc")
                 item.spawn(loc)
             }
         }

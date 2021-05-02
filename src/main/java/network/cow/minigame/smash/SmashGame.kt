@@ -14,6 +14,7 @@ import network.cow.minigame.smash.item.ItemRemoveEvent
 import network.cow.minigame.smash.item.ItemSpawner
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.configuration.MemorySection
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -34,8 +35,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
         val mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
-        val conf: Config = Config.fromMap(this.game.config.options)
-
+        val conf = Config.fromMap(this.game.config.options)
+        itemManager = ItemManger(conf)
 
         ItemSpawner(
             conf.itemsPerInterval,

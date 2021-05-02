@@ -2,6 +2,7 @@ package network.cow.minigame.smash
 
 import network.cow.spigot.extensions.state.getState
 import network.cow.spigot.extensions.state.setState
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.Vector
