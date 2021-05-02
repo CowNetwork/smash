@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-class Hammer(val knockbackMultiplierPercentage: Double, val baseKnockback: Double) : Item() {
+class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : Item() {
 
     private lateinit var handle: ItemStack
 
@@ -19,8 +19,8 @@ class Hammer(val knockbackMultiplierPercentage: Double, val baseKnockback: Doubl
     }
 
     override fun use(user: Player, affected: List<Player>) {
-        val add = baseKnockback * knockbackMultiplierPercentage
-        affected.first().knockback(user.location.clone().direction, baseKnockback + add)
+        val power = baseKnockback * baseKnockbackMultiplier
+        affected.first().knockback(user.location.clone().direction, power)
         this.remove(user)
     }
 

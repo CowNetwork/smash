@@ -8,8 +8,7 @@ import org.bukkit.util.Vector
 
 
 fun Player.knockback(direction: Vector, power: Double) {
-    val reduction = this.getKnockbackStrength() * this.getKnockbackReduction()
-    val actualKnockback = this.getKnockbackStrength() - reduction + power
+    val actualKnockback = this.getKnockbackStrength() * (1.0 - this.getKnockbackReduction()) + power
     this.setKnockbackStrength(this.getKnockbackStrength() + power)
     BummsTask(
         this,

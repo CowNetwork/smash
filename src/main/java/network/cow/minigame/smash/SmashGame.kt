@@ -3,8 +3,12 @@ package network.cow.minigame.smash
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
 import network.cow.minigame.noma.api.phase.EmptyPhaseResult
+import network.cow.minigame.noma.spigot.SpigotGame
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
+import network.cow.minigame.noma.spigot.phase.VotePhase
+import network.cow.minigame.noma.spigot.pool.WorldMeta
 import network.cow.minigame.smash.config.Config
+import network.cow.minigame.smash.config.MapConfig
 import network.cow.minigame.smash.item.ItemManger
 import network.cow.minigame.smash.item.ItemRemoveEvent
 import network.cow.minigame.smash.item.ItemSpawner
@@ -28,12 +32,15 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerLeave(player: Player) = Unit
 
     override fun onStart() {
+        val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
+        val mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
         val conf: Config = Config.fromMap(this.game.config.options)
+
 
         ItemSpawner(
             conf.itemsPerInterval,
             conf.items,
-            conf.itemSpawnLocations, // locations
+            mapConfig.itemSpawnLocations,
             conf.items.map { it.type }.toList(), // generate items to use from configured items
             itemManager
         ).runTaskTimer(

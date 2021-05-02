@@ -3,12 +3,16 @@ game:
   actorProvider:
     kind: network.cow.minigame.noma.spigot.actor.OneToOneActorProvider
 
-  ## smash specific config
+  # smash specific config
   baseKnockback: 0.1
   items:
     - type: HAMMER
       data:
-        knockbackStrengthPercentage: 5
+        # the percentage which determines how hard the hammer slams based on the baseKnockback.
+        # in this case the hammer knockbackStrength is 500% the baseKnockback
+        baseKnockbackMultiplier: 5.0
+
+  # move below to mapconfig
   spawner:
     delay: 1
     interval: 3
