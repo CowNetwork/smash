@@ -49,14 +49,6 @@ fun Player.setHitter(hitter: Hitter?) {
     this.setSmashState(StateKey.HITTER, hitter)
 }
 
-fun Player.canDoubleJump(): Boolean {
-    return this.getSmashState(StateKey.CAN_USE_DOUBLE_JUMP, false)
-}
-
-fun Player.setCanDoubleJump(can: Boolean) {
-    this.setSmashState(StateKey.CAN_USE_DOUBLE_JUMP, can)
-}
-
 fun Player.getLivesLeft(): Int {
     return this.getSmashState(StateKey.LIVES, 1)
 }

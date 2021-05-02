@@ -46,8 +46,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     // TODO: determine percentage based on knockbackStrength and display
     // TODO: ROCKET LAUNCHER
     // TODO: JET_PACK
-    // double jump stärker
     // knockbackStrength reset on death
+    // p
     // leute aufheben und wegwerden (cooldown)
 
     override fun onStart() {
@@ -85,8 +85,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             }
 
             it.allowFlight = true
+            it.gameMode = GameMode.ADVENTURE
             it.setLivesLeft(gameConfig.livesPerPlayer)
-            it.setCanDoubleJump(true)
         }
 
         Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
@@ -110,25 +110,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
         val player = event.player
-
-        /*
-        if (!player.canDoubleJump()) {
-            player.sendMessage(Component.text("NEIN").color(NamedTextColor.RED))
-            event.isCancelled = true
-            return
-        }*/
-
         player.velocity = player.location.direction.setY(0.5).normalize().multiply(2)
         player.allowFlight = false
-        //player.setCanDoubleJump(false)
         event.isCancelled = true
-
-        /*
-        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
-            player.setCanDoubleJump(true)
-            player.allowFlight = true
-            player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 0.5f)
-        }, 20 * gameConfig.doubleJumpCooldown.toLong())*/
     }
 
     @EventHandler

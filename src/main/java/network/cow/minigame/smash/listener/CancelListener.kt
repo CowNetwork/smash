@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 
 class CancelListener : Listener {
@@ -24,6 +25,11 @@ class CancelListener : Listener {
             (e.entity as Player).setCanUseUnstuckCommand(true)
         }
         e.damage = 0.0
+    }
+
+    @EventHandler
+    private fun on(e: FoodLevelChangeEvent) {
+        e.isCancelled = true
     }
 
     @EventHandler
