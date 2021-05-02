@@ -16,5 +16,7 @@ enum class StateKey(val key: String) {
 
     VELOCITY("velocity"),
 
-    ITEM_ID("itemId")
+    ITEM_ID("itemId"),
+
+    CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand")
 }

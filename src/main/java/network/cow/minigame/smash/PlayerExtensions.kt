@@ -19,6 +19,14 @@ fun Player.knockback(direction: Vector, power: Double) {
     ).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)
 }
 
+fun Player.setCanUseUnstuckCommand(can: Boolean) {
+    this.setSmashState(StateKey.CAN_USE_UNSTUCK_COMMAND, can)
+}
+
+fun Player.canUseUnstuckCommand(): Boolean {
+    return this.getSmashState(StateKey.CAN_USE_UNSTUCK_COMMAND, false)
+}
+
 fun Player.getKnockbackReduction(): Double {
     return this.getSmashState(StateKey.KNOCKBACK_REDUCTION, 0.0)
 }

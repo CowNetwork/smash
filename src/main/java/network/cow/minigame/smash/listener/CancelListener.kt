@@ -1,5 +1,8 @@
 package network.cow.minigame.smash.listener
 
+import net.kyori.adventure.text.Component
+import network.cow.minigame.smash.setCanUseUnstuckCommand
+import network.cow.minigame.smash.setSmashState
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -16,6 +19,10 @@ class CancelListener : Listener {
     @EventHandler
     private fun on(e: EntityDamageEvent) {
         if (e.entity !is Player) return
+        if (e.cause == EntityDamageEvent.DamageCause.SUFFOCATION) {
+            e.entity.sendMessage(Component.text("suffocating in a wall? use /unstuck to return"))
+            (e.entity as Player).setCanUseUnstuckCommand(true)
+        }
         e.damage = 0.0
     }
 

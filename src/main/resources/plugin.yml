@@ -6,3 +6,5 @@ author: freggy
 depend:
   - Noma
   - Messages
+commands:
+  unstuck:

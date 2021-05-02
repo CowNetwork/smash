@@ -8,6 +8,7 @@ import network.cow.minigame.noma.spigot.SpigotGame
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
 import network.cow.minigame.noma.spigot.phase.VotePhase
 import network.cow.minigame.noma.spigot.pool.WorldMeta
+import network.cow.minigame.smash.command.UnstuckCommand
 import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.config.MapConfig
 import network.cow.minigame.smash.item.ItemManger
@@ -30,6 +31,7 @@ import kotlin.math.pow
 class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<EmptyPhaseResult>(game, config) {
 
     private lateinit var itemManager: ItemManger
+    private lateinit var conf: Config
 
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
@@ -37,8 +39,12 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
         val mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
-        val conf = Config.fromMap(this.game.config.options)
+        conf = Config.fromMap(this.game.config.options)
         itemManager = ItemManger(conf)
+
+        JavaPlugin.getPlugin(SmashPlugin::class.java).
+            getCommand("unstuck")?.
+            setExecutor(UnstuckCommand(worldMeta.globalSpawnLocations))
 
         ItemSpawner(
             conf.itemsPerInterval,
@@ -80,16 +86,13 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     }
 
     @EventHandler
-    private fun onEntityDamageByEntity(e: EntityDamageByEntityEvent) {
-        /* if (e.entity !is Player) {
-             return
-         }
-
-         val player = e.entity as Player
-         val vel = e.damager.location.clone().direction.normalize().multiply(0)
-
-         // bumms the player away
-         BummsTask(player, vel).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)*/
+    private fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
+        if (event.damager !is Player || event.entity !is Player) return
+        println((event.damager as Player).inventory.itemInMainHand.type)
+        val damager = event.damager as Player
+        val damaged = event.entity as Player
+        if (damager.inventory.itemInMainHand.type != Material.AIR) return
+        damaged.knockback(damager.location.direction, conf.baseKnockback)
     }
 
     @EventHandler
