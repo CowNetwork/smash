@@ -46,15 +46,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
 
-    // TODO: determine percentage based on knockbackStrength and display
+    // TODO: determine percentage based on knockbackStrength and display (0.1 is one % -> 10 is 1000%)
     // TODO: ROCKET LAUNCHER
-    // TODO: ONLY ONE ITEM CAN BE EQUIPPED
-    // TODO: CONFIG OPTION WHETER TO REMOVE ITEM ON DROP OR KEEP IT
-    // TODO: SPAWN MAX_ITEMS
     // TODO: track stats (kills etc.)
     // TODO: use itemBuilder
-    // TODO: leute aufheben und wegwerden (cooldown)
-    // TODO: 0.1 is one % -> 10 is 1000%
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
@@ -144,7 +139,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         val item = this.itemManager.getItemById(id) ?: return
 
         // you can only have one item at a time in the inventory
-        if ((event.entity as Player).inventory.itemInMainHand.type != Material.AIR) {
+        if (!(event.entity as Player).inventory.isEmpty) {
             event.isCancelled = true
             return
         }
@@ -177,10 +172,20 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onPlayerInteract(event: PlayerInteractEntityEvent) {
         if (event.rightClicked !is Player) return
+        val player = event.player
+
+        if (!player.canPickUpPlayer()) return
+
         // Player pickup can only happen if there is no item equipped
         if (event.player.inventory.itemInMainHand.type != Material.AIR) return
+
         val clicked = event.rightClicked as Player
-        event.player.addPassenger(clicked)
+        player.addPassenger(clicked)
+        player.setCanPickUpPlayer(false)
+
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
+            player.setCanPickUpPlayer(true)
+        }, this.gameConfig.playerPickUpCooldown.toLong())
     }
 
     // 159.69.31.183:25565

@@ -12,7 +12,7 @@ class SetDamageCommand : CommandExecutor {
 
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) return false
-        if (!sender.hasPermission("network.cow.minigame.smash.can-set-damage")) return false
+        if (!sender.hasPermission("cow.minigame.smash.can-set-damage")) return false
 
         if (args.size < 2) {
             sender.sendMessage(Component.text("usage: /setdamage <player-name> <damage>"))

@@ -8,7 +8,7 @@ game:
   livesPerPlayer: 2 # -1 is infinite lives - no elimination from the match
   doubleJumpCooldown: 8 # seconds
   maxConcurrentItems: 5 # how many items should be in game at any time
-
+  playerPickUpCooldown: 5 # seconds
   items:
     - type: HAMMER
       data:

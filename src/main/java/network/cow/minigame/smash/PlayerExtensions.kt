@@ -38,6 +38,14 @@ fun Player.looseLife() {
     Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
 }
 
+fun Player.canPickUpPlayer(): Boolean {
+    return this.getSmashState(StateKey.CAN_PICK_UP_PLAYER, true)
+}
+
+fun Player.setCanPickUpPlayer(can: Boolean) {
+    return this.setSmashState(StateKey.CAN_PICK_UP_PLAYER, can)
+}
+
 fun Player.getJetPackUses(): Int {
     return this.getSmashState(StateKey.JET_PACK_USES, 0)
 }

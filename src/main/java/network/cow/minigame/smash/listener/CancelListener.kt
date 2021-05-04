@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -43,7 +44,12 @@ class CancelListener : Listener {
         e.isCancelled = true
     }
 
-    /*
+    @EventHandler
+    private fun on(e: InventoryClickEvent) {
+        // cancel inventory click events so players cant move items around
+        e.isCancelled = true
+    }
+
     @EventHandler
     private fun on(e: PlayerItemDamageEvent) {
         // add items to ignore here
@@ -51,7 +57,7 @@ class CancelListener : Listener {
         if (e.item.type == Material.FLINT_AND_STEEL) return
         e.damage = 0
         e.isCancelled = true
-    }*/
+    }
 
     @EventHandler
     private fun on(e: EntityChangeBlockEvent) {

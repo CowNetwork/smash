@@ -24,5 +24,7 @@ enum class StateKey(val key: String) {
 
     HITTER("hitter"),
 
-    JET_PACK_USES("jetPackUses")
+    JET_PACK_USES("jetPackUses"),
+
+    CAN_PICK_UP_PLAYER("canPickUpPlayer")
 }
