@@ -49,8 +49,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
     // TODO: determine percentage based on knockbackStrength and display (0.1 is one % -> 10 is 1000%)
     // TODO: items:
-    //   * ROCKET_LAUNCHER -> BOW
-    //   * SAFETY_PLATFORM -> SLIME BALL
     //   * TIME_DILATION -> CLOCK
     //     * apply slowness, mining fatigue and double jump should be reduced (or disabled entirely?)
     // TODO: track stats (kills etc.)
