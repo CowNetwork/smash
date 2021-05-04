@@ -33,6 +33,10 @@ class ItemManger(private val config: Config) {
         return this.items[id]
     }
 
+    fun getItemsInGame(): List<Item> {
+        return this.items.values.toList()
+    }
+
     fun removeItem(id: UUID) {
         this.items.remove(id)
     }

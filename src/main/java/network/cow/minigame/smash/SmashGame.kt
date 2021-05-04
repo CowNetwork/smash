@@ -1,5 +1,6 @@
 package network.cow.minigame.smash
 
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.noma.api.Game
@@ -22,11 +23,13 @@ import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
@@ -68,6 +71,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             gameConfig.items,
             mapConfig.itemSpawnLocations,
             gameConfig.items.map { it.type }.toList(), // generate items to use from configured items
+            gameConfig.maxConcurrentItems,
             itemManager
         ).runTaskTimer(
             plugin,
@@ -138,6 +142,13 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         if (event.entity !is Player) return
         val id = event.item.itemStack.getSmashId() ?: return
         val item = this.itemManager.getItemById(id) ?: return
+
+        // you can only have one item at a time in the inventory
+        if ((event.entity as Player).inventory.itemInMainHand.type != Material.AIR) {
+            event.isCancelled = true
+            return
+        }
+
         item.onPickUp(event.entity as Player)
         item.register()
     }
