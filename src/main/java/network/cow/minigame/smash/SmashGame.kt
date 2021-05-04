@@ -52,7 +52,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     //   * SAFETY_PLATFORM -> SLIME BALL
     //   * TIME_DILATION -> CLOCK
     //     * apply slowness, mining fatigue and double jump should be reduced (or disabled entirely?)
-    //   * HAND_GRENADE -> SNOWBALL
     // TODO: track stats (kills etc.)
     // TODO: use itemBuilder
     // TODO: game countdown

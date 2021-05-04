@@ -18,13 +18,25 @@ import org.bukkit.util.Vector
 
 class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val baseKnockback: Double) : Item() {
 
-    lateinit var handle: ItemStack
+    private lateinit var handle: ItemStack
+    private lateinit var impactLocation: Location
 
     override fun spawn(location: Location) {
         location.world.dropItem(location, this.itemStack())
     }
 
-    override fun use(user: Player, affected: List<Player>) = Unit
+    override fun use(user: Player, affected: List<Player>) {
+        affected.forEach {
+            val deltaX = it.location.x - this.impactLocation.x
+            val deltaZ = it.location.z - this.impactLocation.z
+            val vec = Vector(deltaX, 1.0, deltaZ)
+            // TODO: sound
+            // TODO: particle effects
+            it.setHitter(Hitter(user, ItemType.HAND_GRENADE))
+            it.knockback(vec, this.baseKnockbackMultiplier * this.baseKnockback)
+        }
+        this.remove(user)
+    }
 
     override fun itemStack(): ItemStack {
         if (this::handle.isInitialized) {
@@ -48,26 +60,18 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
         if (!stack.isSimilar(this.handle)) return
         val shooter = event.entity.shooter as Player
 
-        // remove here because otherwise EventHandler would be unregistered _before_
-        // before the snowball hits
-        this.remove(shooter)
-
         val location = when {
             event.hitEntity != null -> event.hitEntity!!.location
             event.hitBlock != null -> event.hitBlock!!.location
             else -> Location(event.entity.world, 0.0, 0.0, 0.0)
         }
 
-        location.getNearbyLivingEntities(this.radius).forEach {
-            if (it is Player && it != shooter) {
-                val deltaX = it.location.x - location.x
-                val deltaZ = it.location.z - location.z
-                val vec = Vector(deltaX, 1.0, deltaZ)
-                // TODO: sound
-                // TODO: particle effects
-                it.setHitter(Hitter(event.entity.shooter as Player, ItemType.HAND_GRENADE))
-                it.knockback(vec, this.baseKnockbackMultiplier * this.baseKnockback)
-            }
-        }
+        this.impactLocation = location
+
+        val affected = location.getNearbyLivingEntities(this.radius)
+            .filterIsInstance<Player>()
+            .filter { it != shooter }
+
+        this.use(shooter, affected)
     }
 }
