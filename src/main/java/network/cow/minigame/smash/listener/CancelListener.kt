@@ -24,7 +24,6 @@ class CancelListener : Listener {
     private fun on(e: EntityDamageEvent) {
         if (e.entity !is Player) return
         val player = e.entity as Player
-
         if (e.cause == EntityDamageEvent.DamageCause.SUFFOCATION) {
             player.sendMessage(Component.text("suffocating in a wall? use /unstuck to return"))
             player.setCanUseUnstuckCommand(true)

@@ -11,7 +11,7 @@ phases:
     allowsNewPlayers: true
     phaseEndCountdown:
       duration: 0
-    duration: 10
+    duration: 15
 
   - key: game
     kind: network.cow.minigame.smash.SmashGame

@@ -26,6 +26,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -57,9 +58,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         gameConfig = Config.fromMap(this.game.config.options)
         itemManager = ItemManger(gameConfig)
 
-        JavaPlugin.getPlugin(SmashPlugin::class.java).
-            getCommand("unstuck")?.
-            setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
+        JavaPlugin.getPlugin(SmashPlugin::class.java).getCommand("unstuck")
+            ?.setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
 
         ItemSpawner(
             gameConfig.itemsPerInterval,
@@ -150,13 +150,26 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
         if (event.damager !is Player || event.entity !is Player) return
-        println((event.damager as Player).inventory.itemInMainHand.type)
         val damager = event.damager as Player
         val damaged = event.entity as Player
         if (damager.inventory.itemInMainHand.type != Material.AIR) return
         damaged.setHitter(Hitter(damager, ItemType.NONE))
+        if (damager.passengers.contains(damaged)) {
+            damager.eject()
+        }
         damaged.knockback(damager.location.direction, gameConfig.baseKnockback)
     }
+
+    @EventHandler
+    private fun onPlayerInteract(event: PlayerInteractEntityEvent) {
+        if (event.rightClicked !is Player) return
+        // Player pickup can only happen if there is no item equipped
+        if (event.player.inventory.itemInMainHand.type != Material.AIR) return
+        val clicked = event.rightClicked as Player
+        event.player.addPassenger(clicked)
+    }
+
+    // 159.69.31.183:25565
 
     @EventHandler
     private fun onPlayerMove(e: PlayerMoveEvent) {
@@ -164,7 +177,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
         // reset double jump if player is on ground again
         if (player.location.block.getRelative(BlockFace.DOWN).type != Material.AIR) {
-             player.allowFlight = true
+            player.allowFlight = true
         }
 
         val vel = e.to.clone().toVector().subtract(e.from.clone().toVector())
