@@ -28,6 +28,8 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
         this.remove(user)
     }
 
+    override fun onPickUp(player: Player) = Unit
+
     override fun itemStack(): ItemStack {
         // every item has to make sure that only one ItemStack instance representing it exists.
         if (this::handle.isInitialized) {

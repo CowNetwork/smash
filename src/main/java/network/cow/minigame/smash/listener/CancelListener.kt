@@ -43,11 +43,15 @@ class CancelListener : Listener {
         e.isCancelled = true
     }
 
+    /*
     @EventHandler
     private fun on(e: PlayerItemDamageEvent) {
+        // add items to ignore here
+        // FLINT_AND_STEEL: used as JET_PACK item, item damage indicates how much uses are left
+        if (e.item.type == Material.FLINT_AND_STEEL) return
         e.damage = 0
         e.isCancelled = true
-    }
+    }*/
 
     @EventHandler
     private fun on(e: EntityChangeBlockEvent) {

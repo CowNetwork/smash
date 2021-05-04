@@ -47,6 +47,8 @@ class LesserDamageRemovalFood(private val damageRemoved: Double) : Item() {
         return handle
     }
 
+    override fun onPickUp(player: Player) = Unit
+
     @EventHandler
     private fun onPlayerInteract(event: PlayerInteractEvent) {
         val itemId: UUID? = event.player.inventory.itemInMainHand.getSmashState(StateKey.ITEM_ID)

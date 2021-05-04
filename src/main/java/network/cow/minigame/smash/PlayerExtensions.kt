@@ -38,6 +38,14 @@ fun Player.looseLife() {
     Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
 }
 
+fun Player.getJetPackUses(): Int {
+    return this.getSmashState(StateKey.JET_PACK_USES, 0)
+}
+
+fun Player.setJetPackUses(uses: Int) {
+    return this.setSmashState(StateKey.JET_PACK_USES, uses)
+}
+
 fun Player.getHitter(): Hitter? {
     return this.getSmashState(StateKey.HITTER)
 }

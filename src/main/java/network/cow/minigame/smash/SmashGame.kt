@@ -43,10 +43,11 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
 
-    // TODO: more items
     // TODO: determine percentage based on knockbackStrength and display
     // TODO: ROCKET LAUNCHER
-    // TODO: JET_PACK
+    // TODO: ONLY ONE ITEM CAN BE EQUIPPED
+    // TODO: CONFIG OPTION WHETER TO REMOVE ITEM ON DROP OR KEEP IT
+    // TODO: SPAWN MAX_ITEMS
     // TODO: track stats (kills etc.)
     // TODO: use itemBuilder
     // TODO: leute aufheben und wegwerden (cooldown)
@@ -137,6 +138,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         if (event.entity !is Player) return
         val id = event.item.itemStack.getSmashId() ?: return
         val item = this.itemManager.getItemById(id) ?: return
+        item.onPickUp(event.entity as Player)
         item.register()
     }
 

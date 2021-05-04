@@ -22,5 +22,7 @@ enum class StateKey(val key: String) {
 
     CAN_USE_DOUBLE_JUMP("canUseDoubleJump"),
 
-    HITTER("hitter")
+    HITTER("hitter"),
+
+    JET_PACK_USES("jetPackUses")
 }

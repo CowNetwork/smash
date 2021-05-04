@@ -16,6 +16,9 @@ game:
     - type: LESSER_DAMAGE_REMOVAL_FOOD
       data:
         damageRemoved: 0.05
+    - type: JET_PACK
+      data:
+        uses: 10
   spawner:
     itemsPerInterval: 1
     delay: 20 # ticks

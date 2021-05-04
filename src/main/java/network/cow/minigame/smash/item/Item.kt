@@ -21,9 +21,11 @@ abstract class Item : Listener {
 
     abstract fun itemStack(): ItemStack
 
+    abstract fun onPickUp(player: Player)
+
     open fun remove(user: Player) {
         HandlerList.unregisterAll(this)
-        user.inventory.remove(this.itemStack())
+        user.inventory.remove(user.inventory.itemInMainHand)
         // fire this event to let the item manager know, that this item can be removed
         // from the internal map. Every item needs to take care of this themselves.
         Bukkit.getPluginManager().callEvent(ItemRemoveEvent(this))

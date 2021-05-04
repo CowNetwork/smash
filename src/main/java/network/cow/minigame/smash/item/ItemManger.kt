@@ -20,6 +20,11 @@ class ItemManger(private val config: Config) {
                this.items[item.id] = item
                item
            }
+           ItemType.JET_PACK -> {
+               val item = JetPack(itemConfig.data["uses"] as Int)
+               this.items[item.id] = item
+               item
+           }
            else -> throw IllegalArgumentException("lol")
         }
     }
