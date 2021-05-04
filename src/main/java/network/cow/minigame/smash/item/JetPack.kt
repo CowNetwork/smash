@@ -53,9 +53,9 @@ class JetPack(val uses: Int) : Item() {
 
     override fun itemStack(): ItemStack {
         if (this::handle.isInitialized) {
-            return handle
+            return this.handle
         }
-        handle = ItemStack(Material.FLINT_AND_STEEL)
+        this.handle = ItemStack(Material.FLINT_AND_STEEL)
         val meta = handle.itemMeta
         meta.displayName(Component.text("Jet Pack"))
         meta.lore(listOf(Component.text(this.id.toString()).color(NamedTextColor.BLACK)))

@@ -47,9 +47,16 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerLeave(player: Player) = Unit
 
     // TODO: determine percentage based on knockbackStrength and display (0.1 is one % -> 10 is 1000%)
-    // TODO: ROCKET LAUNCHER
+    // TODO: items:
+    //   * ROCKET_LAUNCHER -> BOW
+    //   * SAFETY_PLATFORM -> SLIME BALL
+    //   * TIME_DILATION -> CLOCK
+    //     * apply slowness, mining fatigue and double jump should be reduced (or disabled entirely?)
+    //   * HAND_GRENADE -> SNOWBALL
     // TODO: track stats (kills etc.)
     // TODO: use itemBuilder
+    // TODO: game countdown
+    // TODO: winning phase
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()

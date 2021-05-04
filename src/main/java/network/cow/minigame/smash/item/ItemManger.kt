@@ -9,23 +9,32 @@ class ItemManger(private val config: Config) {
     private val items: MutableMap<UUID, Item> = mutableMapOf()
 
     fun createItem(type: ItemType, itemConfig: ItemConfig): Item {
-       return when (type) {
+        return when (type) {
             ItemType.HAMMER -> {
                 val item = Hammer(itemConfig.data["baseKnockbackMultiplier"] as Double, config.baseKnockback)
                 this.items[item.id] = item
                 item
             }
-           ItemType.LESSER_DAMAGE_REMOVAL_FOOD -> {
-               val item = LesserDamageRemovalFood(itemConfig.data["damageRemoved"] as Double)
-               this.items[item.id] = item
-               item
-           }
-           ItemType.JET_PACK -> {
-               val item = JetPack(itemConfig.data["uses"] as Int)
-               this.items[item.id] = item
-               item
-           }
-           else -> throw IllegalArgumentException("lol")
+            ItemType.LESSER_DAMAGE_REMOVAL_FOOD -> {
+                val item = LesserDamageRemovalFood(itemConfig.data["damageRemoved"] as Double)
+                this.items[item.id] = item
+                item
+            }
+            ItemType.JET_PACK -> {
+                val item = JetPack(itemConfig.data["uses"] as Int)
+                this.items[item.id] = item
+                item
+            }
+            ItemType.HAND_GRENADE -> {
+                val item = Handgrenade(
+                    itemConfig.data["radius"] as Double,
+                    itemConfig.data["baseKnockbackMultiplier"] as Double,
+                    config.baseKnockback
+                )
+                this.items[item.id] = item
+                item
+            }
+            else -> throw IllegalArgumentException("lol")
         }
     }
 
