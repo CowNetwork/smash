@@ -11,6 +11,7 @@ import network.cow.minigame.noma.spigot.phase.SpigotPhase
 import network.cow.minigame.noma.spigot.phase.VotePhase
 import network.cow.minigame.noma.spigot.pool.WorldMeta
 import network.cow.minigame.smash.command.SetDamageCommand
+import network.cow.minigame.smash.command.SoundCommand
 import network.cow.minigame.smash.command.UnstuckCommand
 import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.config.MapConfig
@@ -67,6 +68,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         plugin.getCommand("unstuck")?.setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
         plugin.getCommand("setdamage")?.setExecutor(SetDamageCommand())
 
+        // DEBUG ONLY
+        plugin.getCommand("playsound")?.setExecutor(SoundCommand())
+        plugin.getCommand("playsound")?.setTabCompleter { commandSender, command, s, strings -> Sound.values().map {it.toString()}.filter { it.contains(strings[0]) }.toList() }
+
         ItemSpawner(
             gameConfig.itemsPerInterval,
             gameConfig.items,
@@ -118,6 +123,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
         val player = event.player
+        player.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_FLAP, .5f, 1.0f)
         player.velocity = player.location.direction.setY(0.5).normalize().multiply(2)
         player.allowFlight = false
         event.isCancelled = true
@@ -133,7 +139,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         if (livesLeft == 0) {
             event.player.gameMode = GameMode.SPECTATOR
             event.player.sendMessage(Component.text("DU BIST RAUS!!!").color(NamedTextColor.BLUE))
-            // TODO: play sound
+            event.player.playSound(event.player.location, Sound.ENTITY_ENDER_DRAGON_GROWL, .5f, 1.0f)
         }
         event.player.teleport(mapConfig.playerSpawnLocations.random())
     }

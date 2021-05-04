@@ -34,6 +34,14 @@ class ItemManger(private val config: Config) {
                 this.items[item.id] = item
                 item
             }
+            ItemType.SAFETY_PLATFORM -> {
+                val item = SafetyPlatform(
+                    itemConfig.data["radius"] as Int,
+                    itemConfig.data["removeAfter"] as Int
+                )
+                this.items[item.id] = item
+                item
+            }
             else -> throw IllegalArgumentException("lol")
         }
     }

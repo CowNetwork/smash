@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.*
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerInteractEvent
@@ -27,7 +28,7 @@ class JetPack(val uses: Int) : Item() {
     }
 
     override fun use(user: Player, affected: List<Player>) {
-        // TODO: play sound
+        user.playSound(user.location, Sound.ENTITY_CAT_HISS, .5f, 1.0f)
         user.velocity = user.location.direction.setY(1).normalize().multiply(1.5)
 
         val remainingUses = user.getJetPackUses().dec()

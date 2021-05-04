@@ -27,7 +27,7 @@ game:
 #        baseKnockbackMultiplier: 5.0 # TODO: change value
     - type: SAFETY_PLATFORM
       data:
-        radius: 10 # blocks
+        radius: 2 # blocks
         removeAfter: 10 # seconds
   spawner:
     itemsPerInterval: 1

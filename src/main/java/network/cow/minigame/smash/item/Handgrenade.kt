@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.*
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.Snowball
@@ -30,8 +31,8 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
             val deltaX = it.location.x - this.impactLocation.x
             val deltaZ = it.location.z - this.impactLocation.z
             val vec = Vector(deltaX, 1.0, deltaZ)
-            // TODO: sound
             // TODO: particle effects
+            it.playSound(it.location, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1f)
             it.setHitter(Hitter(user, ItemType.HAND_GRENADE))
             it.knockback(vec, this.baseKnockbackMultiplier * this.baseKnockback)
         }
@@ -52,6 +53,15 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
     }
 
     override fun onPickUp(player: Player) = Unit
+
+    @EventHandler
+    private fun onProjectileLaunch(event: ProjectileLaunchEvent) {
+        if (event.entityType != EntityType.SNOWBALL) return
+        val stack = ((event.entity) as Snowball).item
+        if (!stack.isSimilar(this.handle)) return
+        val shooter = event.entity.shooter as Player
+        shooter.playSound(shooter.location, Sound.ENTITY_TNT_PRIMED, 1f, 1f)
+    }
 
     @EventHandler
     private fun onProjectileHit(event: ProjectileHitEvent) {
