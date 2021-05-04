@@ -25,7 +25,6 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
 
     override fun use(user: Player, affected: List<Player>) {
         val blocks = mutableListOf<BlockState>()
-
         for (x in -radius until radius) {
             for (z in -radius until radius) {
                 val loc = user.location.clone().add(x.toDouble(), -2.0, z.toDouble())
@@ -34,6 +33,7 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
             }
         }
 
+        this.remove(user)
         user.playSound(user.location, Sound.BLOCK_GILDED_BLACKSTONE_PLACE, 1f, 1f)
 
         // indicates to the player that 3/4 of the time is over and the platform will be removed soon

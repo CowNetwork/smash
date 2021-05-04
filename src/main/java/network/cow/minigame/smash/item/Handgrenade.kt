@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.*
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -27,15 +28,28 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
     }
 
     override fun use(user: Player, affected: List<Player>) {
+        impactLocation.world.playSound(impactLocation, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1f)
         affected.forEach {
             val deltaX = it.location.x - this.impactLocation.x
             val deltaZ = it.location.z - this.impactLocation.z
             val vec = Vector(deltaX, 1.0, deltaZ)
             // TODO: particle effects
-            it.playSound(it.location, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1f)
             it.setHitter(Hitter(user, ItemType.HAND_GRENADE))
             it.knockback(vec, this.baseKnockbackMultiplier * this.baseKnockback)
         }
+
+        impactLocation.world.spawnParticle(
+            Particle.CLOUD,
+            impactLocation.x,
+            impactLocation.y + .5,
+            impactLocation.z,
+            20,
+            1.5,
+            1.5,
+            1.5,
+            .2,
+        )
+
         this.remove(user)
     }
 

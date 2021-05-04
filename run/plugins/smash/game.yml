@@ -21,10 +21,10 @@ game:
 #    - type: JET_PACK
 #      data:
 #        uses: 10
-#    - type: HAND_GRENADE
-#      data:
-#        radius: 10.0
-#        baseKnockbackMultiplier: 5.0 # TODO: change value
+    - type: HAND_GRENADE
+      data:
+        radius: 10.0
+        baseKnockbackMultiplier: 5.0 # TODO: change value
     - type: SAFETY_PLATFORM
       data:
         radius: 2 # blocks
