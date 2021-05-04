@@ -3,7 +3,7 @@ package network.cow.minigame.smash
 enum class StateKey(val key: String) {
 
     // how much knockback the player will receive
-    KNOCKBACK("knockback"),
+    DAMAGE("damage"),
 
     // the knockback reduction in percent
     KNOCKBACK_REDUCTION("knockbackReduction"),

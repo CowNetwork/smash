@@ -43,13 +43,6 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
         return handle
     }
 
-    override fun remove(user: Player) {
-        super.remove(user) // always call super method
-        // fire this event to let the item manager know, that this item can be removed
-        // from the internal map. Every item needs to take care of this themselves.
-        Bukkit.getPluginManager().callEvent(ItemRemoveEvent(this))
-    }
-
     @EventHandler
     private fun onDamage(event: EntityDamageByEntityEvent) {
         if (event.damager !is Player || event.entity !is Player) return

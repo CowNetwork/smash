@@ -15,6 +15,11 @@ class ItemManger(private val config: Config) {
                 this.items[item.id] = item
                 item
             }
+           ItemType.LESSER_DAMAGE_REMOVAL_FOOD -> {
+               val item = LesserDamageRemovalFood(itemConfig.data["damageRemoved"] as Double)
+               this.items[item.id] = item
+               item
+           }
            else -> throw IllegalArgumentException("lol")
         }
     }

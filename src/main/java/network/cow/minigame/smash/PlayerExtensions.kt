@@ -7,14 +7,15 @@ import network.cow.spigot.extensions.state.setState
 import org.bukkit.Bukkit
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.Vector
+import kotlin.math.ceil
+import kotlin.math.floor
 
 
 fun Player.knockback(direction: Vector, power: Double) {
-    val actualKnockback = this.getKnockbackStrength() * (1.0 - this.getKnockbackReduction()) + power
-    this.setKnockbackStrength(this.getKnockbackStrength() + power)
+    val actualKnockback = this.getDamage() * (1.0 - this.getKnockbackReduction()) + power
+    this.setDamage(this.getDamage() + power)
     BummsTask(
         this,
         // use actualKnockback instead of this.getKnockbackStrength() here,
@@ -25,7 +26,7 @@ fun Player.knockback(direction: Vector, power: Double) {
 
 fun Player.looseLife() {
     val livesLeft = this.getSmashState(StateKey.LIVES, 1).dec()
-    this.setKnockbackStrength(0.0)
+    this.setDamage(0.0)
 
     if (livesLeft < 0) { // unlimited lives
         Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
@@ -69,12 +70,17 @@ fun Player.getKnockbackReduction(): Double {
     return this.getSmashState(StateKey.KNOCKBACK_REDUCTION, 0.0)
 }
 
-fun Player.setKnockbackStrength(strength: Double) {
-    return this.setSmashState(StateKey.KNOCKBACK, strength)
+fun Player.removeDamagePercentage(percent: Double) {
+    val remaining = this.getDamage() * (1.0 - percent)
+    this.setDamage(remaining)
 }
 
-fun Player.getKnockbackStrength(): Double {
-    return this.getSmashState(StateKey.KNOCKBACK, 0.0)
+fun Player.setDamage(damage: Double) {
+    return this.setSmashState(StateKey.DAMAGE, damage)
+}
+
+fun Player.getDamage(): Double {
+    return this.getSmashState(StateKey.DAMAGE, 0.0)
 }
 
 fun Player.setSmashState(key: StateKey, value: Any) {

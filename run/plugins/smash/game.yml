@@ -13,6 +13,9 @@ game:
         # the percentage which determines how hard the hammer slams based on the baseKnockback.
         # in this case the hammer knockbackStrength is 500% the baseKnockback
         baseKnockbackMultiplier: 5.0
+    - type: LESSER_DAMAGE_REMOVAL_FOOD
+      data:
+        damageRemoved: 0.05
   spawner:
     itemsPerInterval: 1
     delay: 20 # ticks

@@ -9,6 +9,7 @@ import network.cow.minigame.noma.spigot.SpigotGame
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
 import network.cow.minigame.noma.spigot.phase.VotePhase
 import network.cow.minigame.noma.spigot.pool.WorldMeta
+import network.cow.minigame.smash.command.SetDamageCommand
 import network.cow.minigame.smash.command.UnstuckCommand
 import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.config.MapConfig
@@ -30,7 +31,6 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 
@@ -54,12 +54,13 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
+        val plugin = JavaPlugin.getPlugin(SmashPlugin::class.java)
         mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
         gameConfig = Config.fromMap(this.game.config.options)
         itemManager = ItemManger(gameConfig)
 
-        JavaPlugin.getPlugin(SmashPlugin::class.java).getCommand("unstuck")
-            ?.setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
+        plugin.getCommand("unstuck")?.setExecutor(UnstuckCommand(mapConfig.playerSpawnLocations))
+        plugin.getCommand("setdamage")?.setExecutor(SetDamageCommand())
 
         ItemSpawner(
             gameConfig.itemsPerInterval,
@@ -68,7 +69,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             gameConfig.items.map { it.type }.toList(), // generate items to use from configured items
             itemManager
         ).runTaskTimer(
-            JavaPlugin.getPlugin(SmashPlugin::class.java),
+            plugin,
             gameConfig.itemSpawnerDelay.toLong(),
             gameConfig.itemSpawnerInterval.toLong()
         )
@@ -90,9 +91,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             it.setLivesLeft(gameConfig.livesPerPlayer)
         }
 
-        Bukkit.getScheduler().runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
+        Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             this.game.getPlayers().forEach {
-                it.sendActionBar(Component.text(it.getKnockbackStrength()))
+                it.sendActionBar(Component.text(it.getDamage()))
             }
         }, 0, 20)
     }

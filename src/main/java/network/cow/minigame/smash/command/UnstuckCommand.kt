@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 class UnstuckCommand(private val spawnLocations: List<Location>) : CommandExecutor {
+
     override fun onCommand(sender: CommandSender, cmd: Command, label: String, args: Array<out String>): Boolean {
         if (sender !is Player) return false
         if (!sender.canUseUnstuckCommand()) {

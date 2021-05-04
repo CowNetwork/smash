@@ -1,6 +1,7 @@
 package network.cow.minigame.smash.item
 
 import network.cow.minigame.smash.SmashPlugin
+import network.cow.minigame.smash.event.ItemRemoveEvent
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -23,6 +24,9 @@ abstract class Item : Listener {
     open fun remove(user: Player) {
         HandlerList.unregisterAll(this)
         user.inventory.remove(this.itemStack())
+        // fire this event to let the item manager know, that this item can be removed
+        // from the internal map. Every item needs to take care of this themselves.
+        Bukkit.getPluginManager().callEvent(ItemRemoveEvent(this))
     }
 
     fun register() {
