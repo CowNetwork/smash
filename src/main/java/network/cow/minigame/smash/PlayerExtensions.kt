@@ -14,6 +14,7 @@ import kotlin.math.floor
 
 
 fun Player.knockback(direction: Vector, power: Double) {
+    if (this.isInvulnerable) return
     val actualKnockback = this.getDamage() * (1.0 - this.getKnockbackReduction()) + power
     this.setDamage(this.getDamage() + power)
     BummsTask(

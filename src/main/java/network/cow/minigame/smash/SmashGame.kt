@@ -95,6 +95,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             }
 
             it.allowFlight = true
+            it.isInvulnerable = false
             it.gameMode = GameMode.ADVENTURE
             it.setLivesLeft(gameConfig.livesPerPlayer)
         }
@@ -129,6 +130,14 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     @EventHandler
     private fun onPlayerLostLife(event: PlayerLostLifeEvent) {
         val livesLeft = event.player.getLivesLeft()
+
+        // player will not be affected by any attacks for 2 seconds after respawn
+        // this is the same period as in nintendo smash
+        event.player.isInvulnerable = true
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
+            event.player.isInvulnerable = false
+        }, 20 * 2)
+
         if (livesLeft < 0) { // we have infinite lives left
             event.player.teleport(mapConfig.playerSpawnLocations.random())
             return

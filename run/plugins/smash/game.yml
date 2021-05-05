@@ -7,26 +7,26 @@ game:
   baseKnockback: 0.1
   livesPerPlayer: 2 # -1 is infinite lives - no elimination from the match
   doubleJumpCooldown: 8 # seconds
-  maxConcurrentItems: 200 # how many items should be in game at any time
+  maxConcurrentItems: 10 # how many items should be in game at any time
   playerPickUpCooldown: 5 # seconds
   items:
-#    - type: HAMMER
-#      data:
-#        # the percentage which determines how hard the hammer slams based on the baseKnockback.
-#        # in this case the hammer knockbackStrength is 500% the baseKnockback
-#       baseKnockbackMultiplier: 20.0 # TODO: change value
-#    - type: LESSER_DAMAGE_REMOVAL_FOOD
-#      data:
-#        damageRemoved: 0.05
-#    - type: LESSER_DAMAGE_REMOVAL_FOOD
-#      data:
-#        damageRemoved: 0.9
-#    - type: JET_PACK
-#      data:
-#        uses: 10
+    - type: HAMMER
+      data:
+        # the percentage which determines how hard the hammer slams based on the baseKnockback.
+        # in this case the hammer knockbackStrength is 500% the baseKnockback
+       baseKnockbackMultiplier: 20.0 # TODO: change value
+    - type: LESSER_DAMAGE_REMOVAL_FOOD
+      data:
+        damageRemoved: 0.05
+    - type: LESSER_DAMAGE_REMOVAL_FOOD
+      data:
+        damageRemoved: 0.9
+    - type: JET_PACK
+      data:
+        uses: 10
     - type: HAND_GRENADE
       data:
-        radius: 10.0
+        radius: 10.0 # blocks
         baseKnockbackMultiplier: 5.0 # TODO: change value
     - type: SAFETY_PLATFORM
       data:
