@@ -54,6 +54,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     // TODO: use itemBuilder
     // TODO: game countdown
     // TODO: winning phase
+    // TODO: assign item to spawner until picked up so items wont overlap
+    // TODO: remove velocity when using platform
 
     override fun onStart() {
         val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
@@ -142,6 +144,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
             event.player.teleport(mapConfig.playerSpawnLocations.random())
             return
         }
+
         if (livesLeft == 0) {
             event.player.gameMode = GameMode.SPECTATOR
             event.player.sendMessage(Component.text("DU BIST RAUS!!!").color(NamedTextColor.BLUE))
@@ -203,7 +206,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
         Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
             player.setCanPickUpPlayer(true)
-        }, this.gameConfig.playerPickUpCooldown.toLong())
+        }, this.gameConfig.playerPickUpCooldown.toLong() * 20)
     }
 
     @EventHandler

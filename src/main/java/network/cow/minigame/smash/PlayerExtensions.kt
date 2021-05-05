@@ -34,6 +34,7 @@ fun Player.looseLife() {
         return
     }
 
+    this.inventory.clear()
     this.setSmashState(StateKey.LIVES, livesLeft)
     this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue = livesLeft.toDouble() * 2
     Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))

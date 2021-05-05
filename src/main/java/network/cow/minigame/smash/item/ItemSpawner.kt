@@ -28,7 +28,6 @@ class ItemSpawner(
             val type = types.random()
             this.itemConfigs.find { it.type == type }?.let {
                 val item = itemManger.createItem(type, it)
-                println("spawn")
                 item.spawn(loc)
             }
         }

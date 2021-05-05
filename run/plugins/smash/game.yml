@@ -1,12 +1,11 @@
 game:
-  maxPlayers: 2
+  maxPlayers: 10
   actorProvider:
     kind: network.cow.minigame.noma.spigot.actor.OneToOneActorProvider
 
   # smash specific config
   baseKnockback: 0.1
-  livesPerPlayer: 2 # -1 is infinite lives - no elimination from the match
-  doubleJumpCooldown: 8 # seconds
+  livesPerPlayer: 10 # -1 is infinite lives - no elimination from the match
   maxConcurrentItems: 10 # how many items should be in game at any time
   playerPickUpCooldown: 5 # seconds
   items:
@@ -18,12 +17,12 @@ game:
     - type: LESSER_DAMAGE_REMOVAL_FOOD
       data:
         damageRemoved: 0.05
-    - type: LESSER_DAMAGE_REMOVAL_FOOD
+    - type: BIG_DAMAGE_REMOVAL_FOOD
       data:
         damageRemoved: 0.9
     - type: JET_PACK
       data:
-        uses: 10
+        uses: 6
     - type: HAND_GRENADE
       data:
         radius: 10.0 # blocks

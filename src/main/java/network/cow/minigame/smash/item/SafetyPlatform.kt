@@ -12,6 +12,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.util.Vector
+import javax.lang.model.element.VariableElement
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -25,6 +27,7 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
 
     override fun use(user: Player, affected: List<Player>) {
         val blocks = mutableListOf<BlockState>()
+        user.velocity = Vector(0, 0, 0)
         for (x in -radius until radius) {
             for (z in -radius until radius) {
                 val loc = user.location.clone().add(x.toDouble(), -2.0, z.toDouble())

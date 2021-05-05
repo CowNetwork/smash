@@ -13,18 +13,18 @@ import kotlin.math.roundToInt
 
 
 fun damageToComponent(damage: Double): Component {
-    val percentage = ((damage * 0.1) * 100).roundToInt()
+    val percentage = ((damage * 0.8) * 100).roundToInt() // some random value
     val comp = Component.text("$percentage%")
 
-    if (percentage in 0..10) {
+    if (percentage in 0..20) {
         return comp.color(NamedTextColor.GREEN)
     }
 
-    if (percentage in 11..30) {
+    if (percentage in 21..50) {
         return comp.color(NamedTextColor.YELLOW)
     }
 
-    if (percentage in 31..40) {
+    if (percentage in 51..100) {
         return comp.color(NamedTextColor.RED)
     }
 
