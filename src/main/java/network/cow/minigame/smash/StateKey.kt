@@ -20,8 +20,6 @@ enum class StateKey(val key: String) {
 
     CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand"),
 
-    CAN_USE_DOUBLE_JUMP("canUseDoubleJump"),
-
     HITTER("hitter"),
 
     JET_PACK_USES("jetPackUses"),

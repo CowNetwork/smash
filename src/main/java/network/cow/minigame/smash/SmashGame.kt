@@ -47,7 +47,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
 
-    // TODO: determine percentage based on knockbackStrength and display (0.1 is one % -> 10 is 1000%)
     // TODO: items:
     //   * TIME_DILATION -> CLOCK
     //     * apply slowness, mining fatigue and double jump should be reduced (or disabled entirely?)
@@ -102,7 +101,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             this.game.getPlayers().forEach {
-                it.sendActionBar(Component.text(it.getDamage()))
+                it.sendActionBar(damageToComponent(it.getDamage()))
             }
         }, 0, 20)
     }
@@ -198,8 +197,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         }, this.gameConfig.playerPickUpCooldown.toLong())
     }
 
-    // 159.69.31.183:25565
-
     @EventHandler
     private fun onPlayerMove(e: PlayerMoveEvent) {
         val player = e.player
@@ -223,42 +220,5 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         } else if (vel.lengthSquared() >= 1) {
             player.setSmashState(StateKey.VELOCITY, "HIGH")
         }
-    }
-
-    private fun destroyAndReplaceBlockByBlock(player: Player) {
-        val prev = mutableListOf<BlockState>()
-        val blocks = getNearbyBlocks(player.location, 3)
-
-        // can be empty since getNearbyBlocks can be triggered if only air surrounds the player
-        if (blocks.isEmpty()) return
-
-        getNearbyBlocks(player.location, 3).forEach {
-            prev.add(BlockState(it.location, it.type, it.blockData))
-            val falling = it.world.spawnFallingBlock(it.location, it.blockData)
-            falling.setHurtEntities(false)
-            falling.dropItem = false
-            it.type = Material.AIR
-        }
-
-        player.world.playSound(player.location, Sound.ENTITY_WITHER_BREAK_BLOCK, 1.0f, 1.0f)
-        RebuildTask(prev.iterator()).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 20, 20)
-    }
-
-    private fun getNearbyBlocks(location: Location, radius: Int): List<Block> {
-        val blocks = mutableListOf<Block>()
-        for (x in location.blockX - radius..location.blockX + radius) {
-            for (y in location.blockY - radius..location.blockY + radius) {
-                for (z in location.blockZ - radius..location.blockZ + radius) {
-                    val block = location.world.getBlockAt(x, y, z)
-                    val dist = location.distanceSquared(block.location)
-                    val probability = 1.0 - dist / radius.toDouble().pow(2)
-                    if (Math.random() <= probability) {
-                        if (block.type == Material.AIR) continue
-                        blocks.add(block)
-                    }
-                }
-            }
-        }
-        return blocks
     }
 }
