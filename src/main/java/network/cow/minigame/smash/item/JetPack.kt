@@ -8,6 +8,7 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
@@ -67,6 +68,8 @@ class JetPack(val uses: Int) : Item() {
 
     @EventHandler
     private fun onPlayerInteract(event: PlayerInteractEvent) {
+        // we still want to be able to hit players without using it
+        if (event.action == Action.LEFT_CLICK_AIR || event.action == Action.LEFT_CLICK_BLOCK) return
         // since we change the itemstack we need to have a isSimilar check here
         // because the ItemStack.getState is lost
         if (event.item?.isSimilar(this.handle) != true) return

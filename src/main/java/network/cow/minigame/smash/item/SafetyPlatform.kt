@@ -9,6 +9,7 @@ import network.cow.minigame.smash.setSmashState
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
@@ -83,7 +84,10 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
     override fun onPickUp(player: Player) = Unit
 
     @EventHandler
-    private fun onPlayerInteract(event: PlayerInteractEvent) {
+    private fun onInventoryClick(event: PlayerInteractEvent) {
+        // we still want to be able to hit players without using it
+        if (event.action == Action.LEFT_CLICK_AIR || event.action == Action.LEFT_CLICK_BLOCK) return
+
         // since we change the itemstack we need to have a isSimilar check here
         // because the ItemStack.getState is lost
         if (event.item?.isSimilar(this.handle) != true) return

@@ -12,6 +12,7 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
@@ -61,6 +62,8 @@ class BigDamageRemovalFood(val damageRemoved: Double) : Item() {
 
     @EventHandler
     private fun onPlayerInteract(event: PlayerInteractEvent) {
+        // we still want to be able to hit players without using it
+        if (event.action == Action.LEFT_CLICK_AIR || event.action == Action.LEFT_CLICK_BLOCK) return
         val itemId: UUID? = event.player.inventory.itemInMainHand.getSmashState(StateKey.ITEM_ID)
         if (this.id != itemId) return
         this.use(event.player, listOf())
