@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
-import network.cow.minigame.noma.api.phase.EmptyPhaseResult
 import network.cow.minigame.noma.spigot.SpigotGame
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
 import network.cow.minigame.noma.spigot.phase.VotePhase
@@ -38,7 +37,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import kotlin.math.pow
 
 
-class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<EmptyPhaseResult>(game, config) {
+class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(game, config) {
 
     private lateinit var itemManager: ItemManger
     private lateinit var gameConfig: Config
@@ -46,6 +45,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
 
     override fun onPlayerJoin(player: Player) = Unit
     override fun onPlayerLeave(player: Player) = Unit
+    override fun onTimeout() = Unit
 
     // TODO: items:
     //   * TIME_DILATION -> CLOCK
@@ -58,7 +58,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
     // TODO: remove velocity when using platform
 
     override fun onStart() {
-        val worldMeta = (this.game.getPhase("vote") as VotePhase<WorldMeta>).firstVotedItem()
+        val worldMeta: WorldMeta = this.game.store.get("map") ?: error("no WorldMeta found")
         val plugin = JavaPlugin.getPlugin(SmashPlugin::class.java)
         mapConfig = MapConfig.from((this.game as SpigotGame).world, worldMeta)
         gameConfig = Config.fromMap(this.game.config.options)
@@ -85,7 +85,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         )
 
         // set basic values
-        this.game.getPlayers().forEach {
+        this.game.getIngamePlayers().forEach {
             val attr = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)
             if (gameConfig.livesPerPlayer < 0) { // elimination is not enabled -> unlimited lives
                 // display hearts in a special way to allow the player to distinguish if
@@ -103,17 +103,15 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase<E
         }
 
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
-            this.game.getPlayers().forEach {
+            this.game.getIngamePlayers().forEach {
                 it.sendActionBar(damageToComponent(it.getDamage()))
             }
         }, 0, 20)
     }
 
-    override fun onStop(): EmptyPhaseResult {
-        return EmptyPhaseResult()
+    override fun onStop() {
+        this.storeMiddleware.store("winners", null)
     }
-
-    override fun onTimeout() = Unit
 
     @EventHandler
     private fun onItemRemove(event: ItemRemoveEvent) {

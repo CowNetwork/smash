@@ -5,10 +5,11 @@ services:
     ports:
       - "25565:25565"
     volumes:
-      - "${PWD}/run/plugins/smash/:/opt/spigot/plugins/smash/"
+      - "${PWD}/run/plugins/:/opt/spigot/plugins/"
       - "${PWD}/run/configs/ops.json:/opt/spigot/ops.json"
       - "${PWD}/run/configs/server.properties:/opt/spigot/server.properties"
       - "${PWD}/target/smash-1.0.0.jar:/opt/spigot/plugins/smash-1.0.0.jar"
       - "/home/yannic/cow/noma/noma-spigot/target/noma-spigot-1.0.0.jar:/opt/spigot/plugins/noma-spigot-1.0.0.jar"
       - "/home/yannic/cow/spigot-extensions/target/spigot-extensions-1.0.0.jar:/opt/spigot/plugins/spigot-extensions-1.0.0.jar"
       - "/home/yannic/cow/messages/messages-spigot/target/messages-spigot-1.0.0.jar:/opt/spigot/plugins/messages-spigot-1.0.0.jar"
+      - "/home/yannic/cow/inventory-dsl/target/inventory-dsl-1.0.0.jar:/opt/spigot/plugins/inventory-dsl-1.0.0.jar"

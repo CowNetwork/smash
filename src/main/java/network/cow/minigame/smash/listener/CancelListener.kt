@@ -11,6 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockIgniteEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -41,6 +42,11 @@ class CancelListener : Listener {
 
     @EventHandler
     private fun on(e: FoodLevelChangeEvent) {
+        e.isCancelled = true
+    }
+
+    @EventHandler
+    private fun on(e: BlockIgniteEvent) {
         e.isCancelled = true
     }
 
