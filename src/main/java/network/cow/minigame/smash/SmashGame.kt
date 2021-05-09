@@ -3,8 +3,12 @@ package network.cow.minigame.smash
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
+import network.cow.minigame.noma.api.CountdownTimer
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
+import network.cow.minigame.noma.spigot.SpigotCountdownTimer
 import network.cow.minigame.noma.spigot.SpigotGame
 import network.cow.minigame.noma.spigot.phase.SpigotPhase
 import network.cow.minigame.noma.spigot.phase.VotePhase
@@ -34,6 +38,10 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
+import org.bukkit.potion.PotionEffectTypeWrapper
+import org.bukkit.util.Vector
 import kotlin.math.pow
 
 
@@ -69,7 +77,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
 
         // DEBUG ONLY
         plugin.getCommand("playsound")?.setExecutor(SoundCommand())
-        plugin.getCommand("playsound")?.setTabCompleter { commandSender, command, s, strings -> Sound.values().map {it.toString()}.filter { it.contains(strings[0]) }.toList() }
+        plugin.getCommand("playsound")?.setTabCompleter { commandSender, command, s, strings ->
+            Sound.values().map { it.toString() }.filter { it.contains(strings[0]) }.toList()
+        }
 
         ItemSpawner(
             gameConfig.itemsPerInterval,
@@ -86,6 +96,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
 
         // set basic values
         this.game.getIngamePlayers().forEach {
+            println("HELLLOOOOOOO")
+            println(it)
             val attr = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)
             if (gameConfig.livesPerPlayer < 0) { // elimination is not enabled -> unlimited lives
                 // display hearts in a special way to allow the player to distinguish if
@@ -100,7 +112,26 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
             it.isInvulnerable = false
             it.gameMode = GameMode.ADVENTURE
             it.setLivesLeft(gameConfig.livesPerPlayer)
+            println(it.getLivesLeft())
         }
+
+        val timer = SpigotCountdownTimer(20, "")
+        timer.onTick { time ->
+            this.game.getIngamePlayers().forEach {
+                if (time == 0L) {
+                    it.resetTitle()
+                    it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, .5f, 1f)
+                    it.removePotionEffect(PotionEffectType.JUMP)
+                    it.walkSpeed = 0.2f
+                    return@onTick
+                }
+                it.sendTitle("", "§d§l$time", 10, 20, 10)
+                it.walkSpeed = 0.0f
+                it.addPotionEffect(PotionEffect(PotionEffectType.JUMP, Int.MAX_VALUE, 200, false, false))
+                it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, .5f, .5f)
+            }
+        }
+        timer.start()
 
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             this.game.getIngamePlayers().forEach {
@@ -121,6 +152,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
     @EventHandler
     private fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
         val player = event.player
+        if (player.walkSpeed == 0f) { // player is frozen, any movement should not be possible
+            event.isCancelled = true
+            return
+        }
         player.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_FLAP, .5f, 1.0f)
         player.velocity = player.location.direction.setY(0.5).normalize().multiply(2)
         player.allowFlight = false

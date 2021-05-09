@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerToggleSprintEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class CancelListener : Listener {

@@ -1,7 +1,8 @@
 game:
   maxPlayers: 10
   # minPlayers: 2
-  # minActors: 2 -> nur wichtig wenn teams
+  #minActors: 1 #-> nur wichtig wenn teams
+  minPlayers: 1
   actorProvider:
     kind: network.cow.minigame.noma.spigot.actor.OneToOneActorProvider
 
