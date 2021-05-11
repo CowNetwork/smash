@@ -2,11 +2,14 @@ package network.cow.minigame.smash.item
 
 import network.cow.minigame.smash.config.Config
 import network.cow.minigame.smash.config.ItemConfig
+import org.bukkit.Location
+import org.bukkit.util.Vector
 import java.lang.IllegalArgumentException
 import java.util.*
 
 class ItemManger(private val config: Config) {
     private val items: MutableMap<UUID, Item> = mutableMapOf()
+    private val droppedAt: MutableList<Vector> = mutableListOf()
 
     fun createItem(type: ItemType, itemConfig: ItemConfig): Item {
         return when (type) {
@@ -57,6 +60,18 @@ class ItemManger(private val config: Config) {
 
     fun getItemsInGame(): List<Item> {
         return this.items.values.toList()
+    }
+
+    fun itemDroppedAt(loc: Location) {
+        this.droppedAt.add(loc.toVector())
+    }
+
+    fun isItemAt(location: Location): Boolean {
+        return this.droppedAt.contains(location.toVector())
+    }
+
+    fun pickedUpAt(location: Location) {
+        this.droppedAt.remove(location.toVector())
     }
 
     fun removeItem(id: UUID) {

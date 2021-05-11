@@ -22,10 +22,6 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
 
     private lateinit var handle: ItemStack
 
-    override fun spawn(location: Location) {
-        location.world.dropItem(location, this.itemStack())
-    }
-
     override fun use(user: Player, affected: List<Player>) {
         val blocks = mutableListOf<BlockState>()
         user.velocity = Vector(0, 0, 0)
@@ -80,8 +76,6 @@ class SafetyPlatform(val radius: Int, val removeAfter: Int) : Item() {
         handle.setSmashState(StateKey.ITEM_ID, this.id)
         return handle
     }
-
-    override fun onPickUp(player: Player) = Unit
 
     @EventHandler
     private fun onInventoryClick(event: PlayerInteractEvent) {

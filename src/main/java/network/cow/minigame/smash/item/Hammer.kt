@@ -17,18 +17,12 @@ class Hammer(val baseKnockbackMultiplier: Double, val baseKnockback: Double) : I
 
     private lateinit var handle: ItemStack
 
-    override fun spawn(location: Location) {
-        location.world.dropItem(location, this.itemStack())
-    }
-
     override fun use(user: Player, affected: List<Player>) {
         val power = baseKnockback * baseKnockbackMultiplier
         affected.first().setHitter(Hitter(user, ItemType.HAMMER))
         affected.first().knockback(user.location.clone().direction, power)
         this.remove(user)
     }
-
-    override fun onPickUp(player: Player) = Unit
 
     override fun itemStack(): ItemStack {
         // every item has to make sure that only one ItemStack instance representing it exists.

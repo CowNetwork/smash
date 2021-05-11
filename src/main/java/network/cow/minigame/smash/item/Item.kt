@@ -2,26 +2,35 @@ package network.cow.minigame.smash.item
 
 import network.cow.minigame.smash.SmashPlugin
 import network.cow.minigame.smash.event.ItemRemoveEvent
+import network.cow.minigame.smash.setDropLocation
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitTask
+import org.bukkit.util.EulerAngle
 import java.util.*
 
 abstract class Item : Listener {
 
     val id = UUID.randomUUID()
 
-    abstract fun spawn(location: Location)
+    open fun spawn(location: Location) {
+        this.itemStack().setDropLocation(location)
+        location.world.dropItem(location, this.itemStack())
+    }
 
     abstract fun use(user: Player, affected: List<Player>)
 
     abstract fun itemStack(): ItemStack
 
-    abstract fun onPickUp(player: Player)
+    open fun onPickUp(player: Player) = Unit
 
     open fun remove(user: Player) {
         HandlerList.unregisterAll(this)

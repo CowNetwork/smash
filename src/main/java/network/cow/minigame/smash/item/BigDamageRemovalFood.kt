@@ -21,10 +21,6 @@ class BigDamageRemovalFood(val damageRemoved: Double) : Item() {
 
     private lateinit var handle: ItemStack
 
-    override fun spawn(location: Location) {
-        location.world.dropItem(location, this.itemStack())
-    }
-
     override fun use(user: Player, affected: List<Player>) {
         user.removeDamagePercentage(this.damageRemoved)
         user.location.world.spawnParticle(
@@ -57,8 +53,6 @@ class BigDamageRemovalFood(val damageRemoved: Double) : Item() {
         handle.setSmashState(StateKey.ITEM_ID, this.id)
         return handle
     }
-
-    override fun onPickUp(player: Player) = Unit
 
     @EventHandler
     private fun onPlayerInteract(event: PlayerInteractEvent) {

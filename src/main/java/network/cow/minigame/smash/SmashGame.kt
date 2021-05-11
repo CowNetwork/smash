@@ -60,15 +60,10 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
     override fun onPlayerLeave(player: Player) = Unit
     override fun onTimeout() = Unit
 
-    // TODO: items:
-    //   * TIME_DILATION -> CLOCK
-    //     * apply slowness, mining fatigue and double jump should be reduced (or disabled entirely?)
     // TODO: track stats (kills etc.)
     // TODO: use itemBuilder
-    // TODO: game countdown
     // TODO: winning phase
     // TODO: assign item to spawner until picked up so items wont overlap
-    // TODO: remove velocity when using platform
 
     override fun onStart() {
         val worldMeta: WorldMeta = this.game.store.get("map") ?: error("no WorldMeta found")
@@ -227,6 +222,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
         if (event.entity !is Player) return
         val id = event.item.itemStack.getSmashId() ?: return
         val item = this.itemManager.getItemById(id) ?: return
+        val dropLocation = item.itemStack().getDropLocation() ?: return
 
         // you can only have one item at a time in the inventory
         if (!(event.entity as Player).inventory.isEmpty) {
@@ -234,6 +230,7 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
             return
         }
 
+        this.itemManager.pickedUpAt(dropLocation)
         item.onPickUp(event.entity as Player)
         item.register()
     }

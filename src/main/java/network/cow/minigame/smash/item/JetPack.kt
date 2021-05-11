@@ -20,11 +20,8 @@ class JetPack(val uses: Int) : Item() {
 
     private lateinit var handle: ItemStack
 
-    override fun spawn(location: Location) {
-        location.world.dropItem(location, this.itemStack())
-    }
-
     override fun onPickUp(player: Player) {
+        super.onPickUp(player)
         player.setJetPackUses(uses)
     }
 

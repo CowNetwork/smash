@@ -15,9 +15,11 @@ enum class StateKey(val key: String) {
     KILLS("kills"),
     VELOCITY("velocity"),
     ITEM_ID("itemId"),
+    ITEM_DROP_LOCATION("itemDropLocation"),
     CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand"),
     HITTER("hitter"),
     JET_PACK_USES("jetPackUses"),
     CAN_PICK_UP_PLAYER("canPickUpPlayer"),
     CAN_DESTROY_SURROUNDINGS("canDestroySurroundings")
+
 }

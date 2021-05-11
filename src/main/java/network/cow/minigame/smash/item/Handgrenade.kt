@@ -23,10 +23,6 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
     private lateinit var handle: ItemStack
     private lateinit var impactLocation: Location
 
-    override fun spawn(location: Location) {
-        location.world.dropItem(location, this.itemStack())
-    }
-
     override fun use(user: Player, affected: List<Player>) {
         impactLocation.world.playSound(impactLocation, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 1f, 1f)
         affected.forEach {
@@ -65,8 +61,6 @@ class Handgrenade(val radius: Double, val baseKnockbackMultiplier: Double, val b
         handle.setSmashState(StateKey.ITEM_ID, this.id)
         return handle
     }
-
-    override fun onPickUp(player: Player) = Unit
 
     @EventHandler
     private fun onProjectileLaunch(event: ProjectileLaunchEvent) {
