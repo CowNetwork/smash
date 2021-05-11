@@ -11,26 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-
-fun damageToComponent(damage: Double): Component {
-    val percentage = ((damage * 0.8) * 100).roundToInt() // some random value
-    val comp = Component.text("$percentage%")
-
-    if (percentage in 0..20) {
-        return comp.color(NamedTextColor.GREEN)
-    }
-
-    if (percentage in 21..50) {
-        return comp.color(NamedTextColor.YELLOW)
-    }
-
-    if (percentage in 51..100) {
-        return comp.color(NamedTextColor.RED)
-    }
-
-    return comp.color(NamedTextColor.DARK_RED)
-}
-
 fun destroyAndReplaceBlockByBlock(player: Player) {
     val prev = mutableListOf<BlockState>()
     val blocks = getNearbyBlocks(player.location, 3)

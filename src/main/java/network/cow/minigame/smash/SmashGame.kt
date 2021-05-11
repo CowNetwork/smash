@@ -2,9 +2,11 @@ package network.cow.minigame.smash
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.util.ComponentMessageThrowable
 import network.cow.minigame.noma.api.CountdownTimer
 import network.cow.minigame.noma.api.Game
 import network.cow.minigame.noma.api.config.PhaseConfig
@@ -41,8 +43,11 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.potion.PotionEffectTypeWrapper
+import org.bukkit.scoreboard.DisplaySlot
+import org.bukkit.scoreboard.RenderType
 import org.bukkit.util.Vector
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 
 class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(game, config) {
@@ -81,6 +86,12 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
             Sound.values().map { it.toString() }.filter { it.contains(strings[0]) }.toList()
         }
 
+        val scoreboard = Bukkit.getScoreboardManager().newScoreboard
+        val damageObj = scoreboard.registerNewObjective("damage", "dummy", Component.text("%").color(NamedTextColor.LIGHT_PURPLE), RenderType.INTEGER)
+        val lifeObj = scoreboard.registerNewObjective("lives", "dummy", Component.empty(), RenderType.INTEGER)
+        damageObj.displaySlot = DisplaySlot.BELOW_NAME
+        lifeObj.displaySlot = DisplaySlot.PLAYER_LIST
+
         ItemSpawner(
             gameConfig.itemsPerInterval,
             gameConfig.items,
@@ -96,8 +107,6 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
 
         // set basic values
         this.game.getIngamePlayers().forEach {
-            println("HELLLOOOOOOO")
-            println(it)
             val attr = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)
             if (gameConfig.livesPerPlayer < 0) { // elimination is not enabled -> unlimited lives
                 // display hearts in a special way to allow the player to distinguish if
@@ -107,35 +116,60 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
             } else {
                 attr?.baseValue = gameConfig.livesPerPlayer.toDouble() * 2
             }
-
             it.allowFlight = true
             it.isInvulnerable = false
             it.gameMode = GameMode.ADVENTURE
+            it.scoreboard = scoreboard
             it.setLivesLeft(gameConfig.livesPerPlayer)
             println(it.getLivesLeft())
         }
 
-        val timer = SpigotCountdownTimer(20, "")
-        timer.onTick { time ->
-            this.game.getIngamePlayers().forEach {
-                if (time == 0L) {
+        SpigotCountdownTimer(5, "")
+            .onTick { time ->
+                this.game.getIngamePlayers().forEach {
+                    if (time == 0L) return@onTick
+                    it.sendTitle("", "§d§l$time", 10, 20, 10)
+                    it.walkSpeed = 0.0f
+                    it.addPotionEffect(PotionEffect(PotionEffectType.JUMP, Int.MAX_VALUE, 200, false, false))
+                    it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, .5f, .5f)
+                }
+            }
+            .onDone {
+                this.game.getIngamePlayers().forEach {
                     it.resetTitle()
                     it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, .5f, 1f)
                     it.removePotionEffect(PotionEffectType.JUMP)
                     it.walkSpeed = 0.2f
-                    return@onTick
                 }
-                it.sendTitle("", "§d§l$time", 10, 20, 10)
-                it.walkSpeed = 0.0f
-                it.addPotionEffect(PotionEffect(PotionEffectType.JUMP, Int.MAX_VALUE, 200, false, false))
-                it.playSound(it.location, Sound.BLOCK_NOTE_BLOCK_PLING, .5f, .5f)
             }
-        }
-        timer.start()
+            .silent()
+            .start()
+
 
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             this.game.getIngamePlayers().forEach {
-                it.sendActionBar(damageToComponent(it.getDamage()))
+                val name = (it.displayName() as TextComponent).content()
+
+                val damageScore = damageObj.getScore(name)
+                damageScore.score = it.getDamagePercentage()
+
+                val lifeScore = lifeObj.getScore(name)
+                lifeScore.score = it.getLivesLeft()
+
+                val text = Component.text("Damage: ").color(NamedTextColor.GRAY)
+                    .append(
+                        it.damageToComponent()
+                    )
+                    .append(
+                        Component.text(" | ").color(NamedTextColor.GRAY)
+                    )
+                    .append(
+                        Component.text("Kills: ").color(NamedTextColor.GRAY)
+                    )
+                    .append(
+                        Component.text("${it.getEliminations()}").color(NamedTextColor.LIGHT_PURPLE)
+                    )
+                it.sendActionBar(text)
             }
         }, 0, 20)
     }
@@ -172,6 +206,8 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
         Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(SmashPlugin::class.java), Runnable {
             event.player.isInvulnerable = false
         }, 20 * 2)
+
+        event.player.getHitter()?.player?.addElimination()
 
         if (livesLeft < 0) { // we have infinite lives left
             event.player.teleport(mapConfig.playerSpawnLocations.random())
@@ -254,12 +290,9 @@ class SmashGame(game: Game<Player>, config: PhaseConfig<Player>) : SpigotPhase(g
         val vel = e.to.clone().toVector().subtract(e.from.clone().toVector())
         if (vel.lengthSquared() < 1) {
             val prev = player.getSmashState(StateKey.VELOCITY, "LOW")
-            // Hitter is currently only used to track whether surroundings
-            // should be destroyed or not since normal falling speed could
-            // also trigger prev == "HIGH".
-            if (prev == "HIGH" && player.getHitter() != null) {
+            if (prev == "HIGH" && player.canDestroySurroundings()) {
                 destroyAndReplaceBlockByBlock(player)
-                player.setHitter(null) // reset hitter since we already have been smashed against the wall
+                player.setDestroySurroundings(false)
             }
             player.setSmashState(StateKey.VELOCITY, "LOW")
         } else if (vel.lengthSquared() >= 1) {

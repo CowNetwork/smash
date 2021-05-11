@@ -13,16 +13,11 @@ enum class StateKey(val key: String) {
 
     // how many players the player eliminated
     KILLS("kills"),
-
     VELOCITY("velocity"),
-
     ITEM_ID("itemId"),
-
     CAN_USE_UNSTUCK_COMMAND("canUseUnstuckCommand"),
-
     HITTER("hitter"),
-
     JET_PACK_USES("jetPackUses"),
-
-    CAN_PICK_UP_PLAYER("canPickUpPlayer")
+    CAN_PICK_UP_PLAYER("canPickUpPlayer"),
+    CAN_DESTROY_SURROUNDINGS("canDestroySurroundings")
 }

@@ -1,5 +1,7 @@
 package network.cow.minigame.smash
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import network.cow.minigame.smash.event.PlayerLostLifeEvent
 import network.cow.spigot.extensions.state.clearState
 import network.cow.spigot.extensions.state.getState
@@ -11,18 +13,43 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.util.Vector
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 
 fun Player.knockback(direction: Vector, power: Double) {
     if (this.isInvulnerable) return
     val actualKnockback = this.getDamage() * (1.0 - this.getKnockbackReduction()) + power
     this.setDamage(this.getDamage() + power)
+    this.setDestroySurroundings(true)
     BummsTask(
         this,
         // use actualKnockback instead of this.getKnockbackStrength() here,
         // because we also want to account the temporary reduction if there is any
         direction.normalize().multiply(actualKnockback)
     ).runTaskTimer(JavaPlugin.getPlugin(SmashPlugin::class.java), 0, 1)
+}
+
+fun Player.damageToComponent(): Component {
+    val percentage = this.getDamagePercentage()
+    val comp = Component.text("$percentage%")
+
+    if (percentage in 0..20) {
+        return comp.color(NamedTextColor.GREEN)
+    }
+
+    if (percentage in 21..50) {
+        return comp.color(NamedTextColor.YELLOW)
+    }
+
+    if (percentage in 51..100) {
+        return comp.color(NamedTextColor.RED)
+    }
+
+    return comp.color(NamedTextColor.DARK_RED)
+}
+
+fun Player.getDamagePercentage(): Int {
+    return ((this.getDamage() * 0.8) * 100).roundToInt()
 }
 
 fun Player.looseLife() {
@@ -38,6 +65,22 @@ fun Player.looseLife() {
     this.setSmashState(StateKey.LIVES, livesLeft)
     this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue = livesLeft.toDouble() * 2
     Bukkit.getPluginManager().callEvent(PlayerLostLifeEvent(this))
+}
+
+fun Player.canDestroySurroundings(): Boolean {
+    return this.getSmashState(StateKey.CAN_DESTROY_SURROUNDINGS, false)
+}
+
+fun Player.setDestroySurroundings(can: Boolean) {
+    this.setSmashState(StateKey.CAN_DESTROY_SURROUNDINGS, can)
+}
+
+fun Player.getEliminations(): Int {
+    return this.getSmashState(StateKey.KILLS, 0)
+}
+
+fun Player.addElimination() {
+    this.setSmashState(StateKey.KILLS, this.getSmashState(StateKey.KILLS, 0).inc())
 }
 
 fun Player.canPickUpPlayer(): Boolean {
